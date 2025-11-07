@@ -19,8 +19,9 @@ const loginSchema = yup.object().shape({
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
-  const { login } = useAuth();
+  const { login, error: authError } = useAuth(); // Get error from context
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState(null);
 
   const {
     register,
@@ -33,13 +34,17 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
+      setLoginError(null);
       await login(data);
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
+      setLoginError(
+        error.response?.data?.message ||
+          "Une erreur s'est produite lors de la connexion"
+      );
     }
   };
-
 
   const switchTab = (tab) => {
     if (tab === "register") {
@@ -115,6 +120,13 @@ const Login = () => {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* Show error message */}
+              {(loginError || authError) && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  <p className="text-sm">{loginError || authError}</p>
+                </div>
+              )}
+
               {/* Email Field */}
               <div>
                 <label

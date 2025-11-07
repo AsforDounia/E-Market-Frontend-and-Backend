@@ -4,19 +4,17 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useAuth } from "../hooks/useAuth";
-import Logo from "../assets/images/e-market-logo.jpeg"
 import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
-import { HiShoppingBag } from "react-icons/hi";
 import { FaStore } from "react-icons/fa";
 import LogoWithText from "../components/common/LogoWithText";
 
 // Validation schema
 const registerSchema = yup.object().shape({
-  name: yup
+  fullname: yup
     .string()
     .min(2, "Nom complet requis (min. 2 caractères)")
     .required("Nom complet requis"),
@@ -33,10 +31,6 @@ const registerSchema = yup.object().shape({
     .string()
     .oneOf(["user", "seller"], "Rôle invalide")
     .required("Rôle requis"),
-  acceptTerms: yup
-    .boolean()
-    .oneOf([true], "Vous devez accepter les conditions")
-    .required("Vous devez accepter les conditions"),
 });
 
 const Register = () => {
@@ -56,7 +50,6 @@ const Register = () => {
     mode: "onBlur",
     defaultValues: {
       role: "user",
-      acceptTerms: false,
     },
   });
 
@@ -64,7 +57,7 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
-      const { acceptTerms, confirmPassword, ...registerData } = data;
+      const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
       navigate("/");
     } catch (error) {
@@ -214,25 +207,25 @@ const Register = () => {
               {/* Name Field */}
               <div>
                 <label
-                  htmlFor="name"
+                  htmlFor="fullname"
                   className="block text-sm font-semibold text-gray-900 mb-2"
                 >
                   Nom complet
                 </label>
                 <input
                   type="text"
-                  id="name"
-                  {...register("name")}
+                  id="fullname"
+                  {...register("fullname")}
                   placeholder="Jean Dupont"
                   className={`w-full px-4 py-3 border-2 rounded-lg transition-all focus:outline-none focus:ring-4 focus:ring-blue-100 ${
-                    errors.name
+                    errors.fullname
                       ? "border-red-500"
                       : "border-gray-200 focus:border-blue-500"
                   }`}
                 />
-                {errors.name && (
+                {errors.fullname && (
                   <p className="text-red-500 text-xs mt-2">
-                    {errors.name.message}
+                    {errors.fullname.message}
                   </p>
                 )}
               </div>
