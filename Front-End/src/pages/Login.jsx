@@ -5,7 +5,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useAuth } from "../hooks/useAuth";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import LogoWithText from "../components/common/LogoWithText";
 
 // Validation schema
 const loginSchema = yup.object().shape({
@@ -36,7 +35,6 @@ const Login = () => {
     try {
       setLoginError(null);
       await login(data);
-      navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       setLoginError(
@@ -53,11 +51,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center p-5">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full grid md:grid-cols-2 min-h-[600px]">
+    <div className="min-h-max max-h-max bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-12">
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full grid md:grid-cols-2 max-h-[78.3vh]">
         {/* Sidebar */}
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-12 text-white flex flex-col justify-center hidden md:flex">
-          <LogoWithText />
 
           <h2 className="text-3xl font-bold my-4 leading-tight">
             Bienvenue sur votre marketplace préférée

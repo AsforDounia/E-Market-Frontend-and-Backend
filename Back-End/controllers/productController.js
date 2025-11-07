@@ -17,11 +17,11 @@ async function getAllProducts(req, res, next) {
             sortBy,
             order,
             page = 1,
-            limit = 10,
+            limit = 8,
         } = req.query;
 
         const filter = {
-            // deletedAt: null,
+            deletedAt: null,
             // validationStatus: 'approved',
             // isVisible: true
         };
@@ -189,7 +189,7 @@ async function createProduct(req, res, next) {
         if (req.files && req.files.length > 0) {
             const imageDocs = req.files.map((file, index) => ({
                 product: product._id,
-                imageUrl: `/uploads/products/${file.filename}`,
+                imageUrl: `/uploads/products/optimized/${file.filename}`,
                 isPrimary: index === 0,
             }));
 

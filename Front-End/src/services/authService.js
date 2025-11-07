@@ -36,7 +36,7 @@ export const register = async (userData) => {
 // Fonction pour obtenir le profil utilisateur
 export const getProfile = async () => {
   try {
-    const response = await api.get('/auth/profile');
+    const response = await api.get('/users/profile');
     return response.data;
   } catch (error) {
     console.error('Get profile error:', error);

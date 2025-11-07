@@ -1,9 +1,10 @@
 import { createContext, useState, useEffect } from 'react';
 import { login as loginService, register as registerService, logout as logoutService } from '../services/authService';
+import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
-
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,8 +34,8 @@ export const AuthProvider = ({ children }) => {
       
       setUser(response.data.user);
       setLoading(false);
-      
-      return response;
+
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur de connexion');
       setLoading(false);
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         }
         
         setLoading(false);
-        return response;
+        navigate("/")
       } catch (err) {
         const errorMessage = err.response?.data?.message ||
                             err.response?.data?.error ||
@@ -76,6 +77,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await logoutService();
+      navigate("/")
     } catch (err) {
       console.error('Erreur lors de la déconnexion:', err);
     } finally {

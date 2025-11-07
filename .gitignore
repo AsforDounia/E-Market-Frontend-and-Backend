@@ -5,7 +5,7 @@ Back-End/.idea
 Back-End/.devcontainer
 Back-End/logs
 Back-End/coverage
-
+Back-End/uploads
 
 Front-End/node_modules
 Front-End/.env

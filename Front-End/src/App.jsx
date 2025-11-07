@@ -28,13 +28,9 @@ function App() {
 
     <BrowserRouter>
       <AuthProvider>
-        {isAuthPage ? (
-          <AppRoutes />
-        ) : (
           <Layout>
             <AppRoutes />
           </Layout>
-        )}
         <ToastContainer
           position="top-right"
           autoClose={3000}

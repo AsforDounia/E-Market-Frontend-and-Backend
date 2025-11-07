@@ -10,7 +10,6 @@ import {
   AiOutlineShoppingCart,
 } from "react-icons/ai";
 import { FaStore } from "react-icons/fa";
-import LogoWithText from "../components/common/LogoWithText";
 
 // Validation schema
 const registerSchema = yup.object().shape({
@@ -59,7 +58,6 @@ const Register = () => {
     try {
       const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
-      navigate("/");
     } catch (error) {
       console.error("Register error:", error);
     }
@@ -72,11 +70,10 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center p-5">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full grid md:grid-cols-2 min-h-[600px]">
+    <div className="min-h-max bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-12 max-h-max">
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full grid md:grid-cols-2 max-h-[78.3vh]">
         {/* Sidebar */}
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-12 text-white flex flex-col justify-center hidden md:flex">
-          <LogoWithText />
 
           <h2 className="text-3xl font-bold my-4 leading-tight">
             Rejoignez notre communauté

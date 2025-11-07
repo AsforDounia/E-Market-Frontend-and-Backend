@@ -40,7 +40,7 @@ const router = express.Router();
  *       400:
  *         description: Invalid input
  */
-router.post("/register", createLimiter(1, 5), validate(registerSchema), authController.register);
+router.post("/register", validate(registerSchema), authController.register);
 
 /**
  * @swagger
