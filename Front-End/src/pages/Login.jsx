@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useAuth } from "../hooks/useAuth";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Alert, Button, Input, PasswordInput, Tabs } from "../components/common";
 
 // Validation schema
 const loginSchema = yup.object().shape({
@@ -16,7 +16,6 @@ const loginSchema = yup.object().shape({
 });
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const { login, error: authError } = useAuth(); // Get error from context
   const navigate = useNavigate();
@@ -44,18 +43,22 @@ const Login = () => {
     }
   };
 
-  const switchTab = (tab) => {
-    if (tab === "register") {
+  const switchTab = (value) => {
+    if (value === "register") {
       navigate("/register");
     }
   };
+
+  const tabs = [
+    { label: "Connexion", value: "login" },
+    { label: "Inscription", value: "register" },
+  ];
 
   return (
     <div className="min-h-max max-h-max bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-12">
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full grid md:grid-cols-2 max-h-[78.3vh]">
         {/* Sidebar */}
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-12 text-white flex flex-col justify-center hidden md:flex">
-
           <h2 className="text-3xl font-bold my-4 leading-tight">
             Bienvenue sur votre marketplace préférée
           </h2>
@@ -81,7 +84,7 @@ const Login = () => {
         </div>
 
         {/* Login Form */}
-        <div className="p-12 max-h-[90vh] overflow-y-auto">
+        <div className="p-12 overflow-y-auto pt-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Connexion</h1>
             <p className="text-gray-600 text-sm">
@@ -91,103 +94,38 @@ const Login = () => {
 
           <div className="flex flex-col justify-center">
             {/* Tab Switcher */}
-            <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-lg">
-              <button
-                type="button"
-                onClick={() => setActiveTab("login")}
-                className={`flex-1 py-3 px-4 rounded-md font-semibold text-sm transition-all ${
-                  activeTab === "login"
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Connexion
-              </button>
-              <button
-                type="button"
-                onClick={() => switchTab("register")}
-                className={`flex-1 py-3 px-4 rounded-md font-semibold text-sm transition-all ${
-                  activeTab === "register"
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                Inscription
-              </button>
-            </div>
+            <Tabs
+              tabs={tabs}
+              activeTab={activeTab}
+              onChange={switchTab}
+              className="mb-8"
+            />
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Show error message */}
               {(loginError || authError) && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                  <p className="text-sm">{loginError || authError}</p>
-                </div>
+                <Alert type="error" message={loginError || authError} />
               )}
 
               {/* Email Field */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-semibold text-gray-900 mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  {...register("email")}
-                  placeholder="votre@email.com"
-                  className={`w-full px-4 py-3 border-2 rounded-lg transition-all focus:outline-none focus:ring-4 focus:ring-blue-100 ${
-                    errors.email
-                      ? "border-red-500"
-                      : "border-gray-200 focus:border-blue-500"
-                  }`}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-2">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
+              <Input
+                label="Email"
+                type="email"
+                id="email"
+                placeholder="votre@email.com"
+                error={errors.email?.message}
+                required
+                {...register("email")}
+              />
 
               {/* Password Field */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-semibold text-gray-900 mb-2"
-                >
-                  Mot de passe
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    {...register("password")}
-                    placeholder="••••••••"
-                    className={`w-full px-4 py-3 border-2 rounded-lg transition-all focus:outline-none focus:ring-4 focus:ring-blue-100 ${
-                      errors.password
-                        ? "border-red-500"
-                        : "border-gray-200 focus:border-blue-500"
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? (
-                      <AiOutlineEyeInvisible className="w-5 h-5" />
-                    ) : (
-                      <AiOutlineEye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-500 text-xs mt-2">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
+              <PasswordInput
+                label="Mot de passe"
+                id="password"
+                error={errors.password?.message}
+                required
+                {...register("password")}
+              />
 
               {/* Forgot Password */}
               <div className="text-right">
@@ -200,13 +138,14 @@ const Login = () => {
               </div>
 
               {/* Submit Button */}
-              <button
+              <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                fullWidth
+                loading={isSubmitting}
+                size="lg"
               >
-                {isSubmitting ? "Connexion..." : "Se connecter"}
-              </button>
+                Se connecter
+              </Button>
             </form>
           </div>
         </div>

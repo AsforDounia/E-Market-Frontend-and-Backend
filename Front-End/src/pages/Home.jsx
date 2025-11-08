@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useFetch from '../hooks/useFetch';
 import logo from '../assets/images/e-market-logo.jpeg';
+import { Alert, Badge, Button, Card, LoadingSpinner, Pagination, StarRating } from '../components/common';
 
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,38 +18,23 @@ const Home = () => {
 
   const metadata = data?.metadata || {};
 
-  const renderStars = (rating) => (
-    <div className="flex gap-1 text-amber-500">
-      {[...Array(5)].map((_, index) => (
-        <span key={index}>{index < rating ? '★' : '☆'}</span>
-      ))}
-    </div>
-  );
-
   const renderStockIndicator = (product) => {
     const stockQuantity = product.stock || 0;
+    
     if (stockQuantity === 0) {
-      return (
-        <div className="inline-flex items-center gap-2 text-sm font-medium text-red-500">
-          <span className="w-2 h-2 rounded-full bg-red-500"></span>
-          Rupture de stock
-        </div>
-      );
+      return <Badge variant="danger" dot>Rupture de stock</Badge>;
     }
     if (stockQuantity > 0 && stockQuantity <= 10) {
-      return (
-        <div className="inline-flex items-center gap-2 text-sm font-medium text-amber-500">
-          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-          Stock limité ({stockQuantity} restants)
-        </div>
-      );
+      return <Badge variant="warning" dot>Stock limité ({stockQuantity} restants)</Badge>;
     }
-    return (
-      <div className="inline-flex items-center gap-2 text-sm font-medium text-green-500">
-        <span className="w-2 h-2 rounded-full bg-green-500"></span>
-        En stock ({stockQuantity} disponibles)
-      </div>
-    );
+    return <Badge variant="success" dot>En stock ({stockQuantity} disponibles)</Badge>;
+  };
+
+  const getProductImage = (imageUrls) => {
+    if (!imageUrls || imageUrls.length === 0) return logo;
+    const primaryImage = imageUrls.find((img) => img.isPrimary);
+    const imageUrl = primaryImage ? primaryImage.imageUrl : imageUrls[0].imageUrl;
+    return `${baseUrl}${imageUrl}`;
   };
 
   return (
@@ -62,14 +48,14 @@ const Home = () => {
         </h2>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <p>Erreur lors du chargement des produits: {error}</p>
-          </div>
+          <Alert 
+            type="error" 
+            message={`Erreur lors du chargement des produits: ${error}`}
+          />
         )}
 
         {loading ? (
-          // Skeleton loader...
-          <div>Chargement...</div>
+          <LoadingSpinner size="lg" text="Chargement des produits..." />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -78,20 +64,14 @@ const Home = () => {
                 const averageRating = product.averageRating || 0;
 
                 return (
-                  <div
-                    key={product._id}
-                    className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-                  >
+                  <Card key={product._id} hover padding="none">
                     <Link to={`/product/${product._id}`}>
                       <img
-                        src={
-                          product.imageUrls.length > 0
-                            ? `${baseUrl}${product.imageUrls[0]}`
-                            : logo
-                        }
+                        src={getProductImage(product.imageUrls)}
                         alt={product.title}
                         className="w-full h-64 object-cover"
                         loading="lazy"
+                        crossOrigin="anonymous"
                       />
                     </Link>
 
@@ -102,9 +82,9 @@ const Home = () => {
                         </h3>
                       </Link>
 
-                      {renderStars(Math.round(averageRating))}
+                      <StarRating rating={averageRating} showValue />
 
-                      <p className="text-sm text-gray-600 mt-2 mb-3">
+                      <p className="text-sm text-gray-600 mt-2 mb-3 line-clamp-2">
                         {product.description}
                       </p>
 
@@ -116,63 +96,34 @@ const Home = () => {
 
                       {renderStockIndicator(product)}
 
-                      <button
+                      <Button
+                        fullWidth
                         disabled={!isInStock}
-                        className={`w-full mt-3 py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
-                          isInStock
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white transform hover:-translate-y-0.5 hover:shadow-md'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
+                        variant={isInStock ? 'primary' : 'secondary'}
+                        className="mt-3"
                       >
                         {isInStock ? 'Ajouter au panier' : 'Indisponible'}
-                      </button>
+                      </Button>
                     </div>
-                  </div>
+                  </Card>
                 );
               })}
             </div>
 
             {/* Pagination */}
             {!loading && metadata?.totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-10">
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={!metadata.hasPreviousPage}
-                  className={`px-5 py-2 rounded-lg font-medium transition-all ${
-                    metadata.hasPreviousPage
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  ← Précédent
-                </button>
-
-                <span className="text-gray-700 font-medium">
-                  Page {metadata.currentPage} / {metadata.totalPages}
-                </span>
-
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(prev + 1, metadata.totalPages)
-                    )
-                  }
-                  disabled={!metadata.hasNextPage}
-                  className={`px-5 py-2 rounded-lg font-medium transition-all ${
-                    metadata.hasNextPage
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  Suivant →
-                </button>
-              </div>
+              <Pagination
+                currentPage={metadata.currentPage}
+                totalPages={metadata.totalPages}
+                hasNextPage={metadata.hasNextPage}
+                hasPreviousPage={metadata.hasPreviousPage}
+                onPageChange={setCurrentPage}
+                className="mt-10"
+              />
             )}
           </>
         )}
       </section>
-
-      {/* Features + Newsletter */}
     </div>
   );
 };

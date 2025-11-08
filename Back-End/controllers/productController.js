@@ -1,5 +1,5 @@
 import { Product, ProductCategory, Category, ProductImage } from "../models/Index.js";
-import { getProductCategories } from "../services/productService.js";
+import { getProductCategories, getProductImages } from "../services/productService.js";
 import mongoose from "mongoose";
 import { AppError } from "../middlewares/errorHandler.js";
 import notificationService from "../services/notificationService.js";
@@ -84,13 +84,14 @@ async function getAllProducts(req, res, next) {
         const results = await Promise.all(
             filteredProducts.map(async (product) => {
                 const categories = await getProductCategories(product._id);
+                const imageUrls = await getProductImages(product._id);
                 return {
                     _id: product._id,
                     title: product.title,
                     description: product.description,
                     price: product.price,
                     stock: product.stock,
-                    imageUrls: product.imageUrls,
+                    imageUrls: imageUrls,
                     validationStatus: product.validationStatus,
                     isVisible: product.isVisible,
                     isAvailable: product.isAvailable,
@@ -155,15 +156,38 @@ async function getProductById(req, res, next) {
 async function createProduct(req, res, next) {
     try {
         const sellerId = req.user?._id;
-        const { title, description, price, stock, categoryIds } = req.body;
+        let { title, description, price, stock, categoryIds } = req.body;
+
+        // ======== PARSE CATEGORYIDS IF STRING ========
+       
+
+        if (typeof categoryIds === 'string') {
+            try {
+                categoryIds = JSON.parse(categoryIds);
+            } catch (e) {
+                throw new AppError("Invalid categoryIds format", 400);
+            }
+        }
+
+        
+        // Handle case where categoryIds is an array with a single string element
+        if (Array.isArray(categoryIds) && categoryIds.length === 1 && typeof categoryIds[0] === 'string') {
+            try {
+                categoryIds = JSON.parse(categoryIds[0]);
+            } catch (e) {
+                throw new AppError("Invalid categoryIds format", 400);
+            }
+        }
 
         // ======== VALIDATIONS ========
         if (!sellerId) throw new AppError("Seller information is required", 400);
-        if (!title || !description || price == null || stock == null)
-            throw new AppError("Title, description, price, and stock are required", 400);
-        if (categoryIds && !Array.isArray(categoryIds))
+        if (!title || !description || price == null || stock == null || !categoryIds)
+            throw new AppError("Title, description, price, stock and categories are required", 400);
+        if (!Array.isArray(categoryIds))
             throw new AppError("categoryIds must be an array", 400);
-        if (categoryIds && categoryIds.some((id) => !ObjectId.isValid(id)))
+        if (categoryIds.length === 0)
+            throw new AppError("At least one category is required", 400);
+        if (categoryIds.some((id) => !ObjectId.isValid(id)))
             throw new AppError("Invalid category ID", 400);
 
         // ======== CREATE PRODUCT ========
@@ -177,13 +201,11 @@ async function createProduct(req, res, next) {
         });
 
         // ======== ADD CATEGORIES ========
-        if (Array.isArray(categoryIds) && categoryIds.length > 0) {
-            const categoryLinks = categoryIds.map((categoryId) => ({
-                product: product._id,
-                category: categoryId,
-            }));
-            await ProductCategory.insertMany(categoryLinks);
-        }
+        const categoryLinks = categoryIds.map((categoryId) => ({
+            product: product._id,
+            category: categoryId,
+        }));
+        await ProductCategory.insertMany(categoryLinks);
 
         // ======== HANDLE IMAGES ========
         if (req.files && req.files.length > 0) {

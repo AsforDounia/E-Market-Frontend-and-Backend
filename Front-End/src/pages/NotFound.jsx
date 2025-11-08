@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Button } from '../components/common';
 
 const NotFound = () => {
   return (
@@ -11,11 +12,10 @@ const NotFound = () => {
         <p className="mt-2 text-gray-600">
           La page que vous recherchez n'existe pas.
         </p>
-        <Link
-          to="/"
-          className="mt-6 inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700"
-        >
-          Retour à l'accueil
+        <Link to="/">
+          <Button size="lg" className="mt-6">
+            Retour à l'accueil
+          </Button>
         </Link>
       </div>
     </div>

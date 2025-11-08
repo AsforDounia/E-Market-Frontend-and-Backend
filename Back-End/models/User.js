@@ -21,7 +21,6 @@ const UserSchema = new Schema(
         },
         role: {
             type: String,
-            // enum: ['user', 'admin'], return msg
             enum: {
                 values: ["user", "seller", "admin"],
                 message: "Role must be either user, seller or admin",
