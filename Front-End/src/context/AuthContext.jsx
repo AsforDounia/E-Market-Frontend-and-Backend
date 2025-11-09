@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       setLoading(false);
 
-      navigate("/");
+      navigate("/products");
     } catch (err) {
       setError(err.response?.data?.message || 'Erreur de connexion');
       setLoading(false);
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         }
         
         setLoading(false);
-        navigate("/")
+        navigate("/products")
       } catch (err) {
         const errorMessage = err.response?.data?.message ||
                             err.response?.data?.error ||

@@ -69,7 +69,7 @@ router.post("/register", validate(registerSchema), authController.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/login", createLimiter(1, 10), validate(loginSchema), authController.login);
+router.post("/login", validate(loginSchema), authController.login);
 
 /**
  * @swagger

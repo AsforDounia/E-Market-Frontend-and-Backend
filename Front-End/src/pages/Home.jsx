@@ -25,7 +25,7 @@ import {
 import { FaTshirt, FaFootballBall } from 'react-icons/fa';
 import { MdLocalFlorist } from 'react-icons/md';
 
-// ✅ Move static constants outside component (better performance)
+// Move static constants outside component (better performance)
 const FEATURES = [
   {
     icon: <AiOutlineRocket className="w-8 h-8" />,
@@ -108,21 +108,21 @@ const Home = () => {
 
   const baseUrl = import.meta.env.VITE_API_URL.replace('/api/v2', '');
 
-  // ✅ Safe product fetch
+  // Safe product fetch
   useEffect(() => {
     if (productsData?.data?.products?.length) {
       setFeaturedProducts(productsData.data.products);
     }
   }, [productsData]);
 
-  // ✅ Safe categories fetch
+  // Safe categories fetch
   useEffect(() => {
     if (categoriesData?.data?.categories?.length) {
       setCategories(categoriesData.data.categories);
     }
   }, [categoriesData]);
 
-  // ✅ Safe image handling
+  // Safe image handling
   const getProductImage = (imageUrls) => {
     try {
       if (!Array.isArray(imageUrls) || imageUrls.length === 0) return logo;
@@ -134,17 +134,16 @@ const Home = () => {
     }
   };
 
-  // ✅ Handle Add to Cart
+  // Handle Add to Cart
   const handleAddToCart = useCallback((product) => {
-    // Example placeholder logic — replace with your cart API or context
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     const exists = cart.find((item) => item._id === product._id);
     if (!exists) {
       cart.push({ ...product, quantity: 1 });
       localStorage.setItem('cart', JSON.stringify(cart));
-      alert(`✅ ${product.title} ajouté au panier`);
+      alert(`${product.title} ajouté au panier`);
     } else {
-      alert(`🛒 ${product.title} est déjà dans le panier`);
+      alert(`${product.title} est déjà dans le panier`);
     }
   }, []);
 
@@ -175,9 +174,9 @@ const Home = () => {
                 {!user && (
                   <Button
                     size="lg"
-                    variant="secondary"
+                    variant="gradient"
                     onClick={() => navigate('/register')}
-                    className="border-2 border-white text-white hover:bg-white hover:text-blue-600"
+                    // className="border-2 border-white text-white hover:bg-white hover:text-blue-600"
                   >
                     S'inscrire gratuitement
                   </Button>
@@ -394,7 +393,7 @@ const Home = () => {
       </section>
 
       {/* 🚀 CTA Section */}
-      {!user && (
+      {/* {!user && (
         <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
           <div className="container max-w-screen-xl mx-auto px-5 text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -423,7 +422,7 @@ const Home = () => {
             </div>
           </div>
         </section>
-      )}
+      )} */}
     </div>
   );
 };
