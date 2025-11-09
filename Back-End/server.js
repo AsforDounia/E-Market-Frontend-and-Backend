@@ -3,6 +3,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development";
 console.log("Current NODE_ENV:", process.env.NODE_ENV);
 
 import DotenvFlow from "dotenv-flow";
+import cors from 'cors';
 
 // Configure dotenv-flow to look in the current directory
 DotenvFlow.config({
@@ -82,7 +83,6 @@ app.get("/api-docs/v2/swagger.json", (req, res) => {
 });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(null, swaggerOptions));
-const cors = require('cors');
 
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174'],

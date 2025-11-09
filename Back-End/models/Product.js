@@ -64,6 +64,11 @@ const ProductSchema = new Schema(
             type: Date,
             default: null,
         },
+        slug: {
+            type: String,
+            unique: true,
+            required: true,
+        }
     },
     {
         collection: "products",

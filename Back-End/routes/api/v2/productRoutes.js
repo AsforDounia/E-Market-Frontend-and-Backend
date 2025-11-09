@@ -158,7 +158,7 @@ productRoutes.get(
     cache("product", 600),
     productController.getProductById
 );
-
+productRoutes.get('/slug/:slug', productController.getProductBySlug);
 /**
  * @swagger
  * /products:

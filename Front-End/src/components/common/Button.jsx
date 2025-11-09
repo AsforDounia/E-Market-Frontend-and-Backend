@@ -19,6 +19,9 @@ const Button = ({
     success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-100',
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-100',
     ghost: 'text-blue-600 hover:bg-blue-50 focus:ring-blue-100',
+    gradient: 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 focus:ring-indigo-100',
+    dark: 'bg-gray-900 text-white hover:bg-black focus:ring-gray-300',
+    light: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-200 focus:ring-gray-100 transform hover:-translate-y-0.5 hover:text-black',
   };
 
   const sizes = {

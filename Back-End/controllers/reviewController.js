@@ -2,6 +2,7 @@ import { Order, OrderItem, Product, Review } from "../models/Index.js";
 import { AppError } from "../middlewares/errorHandler.js";
 import mongoose from "mongoose";
 import cacheInvalidation from "../services/cacheInvalidation.js";
+import { getReviewsForProduct } from "../services/reviewService.js";
 const ObjectId = mongoose.Types.ObjectId;
 
 const addReview = async (req, res, next) => {
@@ -46,29 +47,23 @@ const addReview = async (req, res, next) => {
 };
 
 const getProductReviews = async (req, res, next) => {
-    try {
-        const { productId } = req.params;
-        if (!ObjectId.isValid(productId)) throw new AppError("Invalid product ID", 400);
+  try {
+    const { productId } = req.params;
+    if (!ObjectId.isValid(productId)) throw new AppError("Invalid product ID", 400);
 
-        const product = await Product.findById(productId);
-        if (!product) throw new AppError("Product not found", 404);
+    const product = await Product.findById(productId);
+    if (!product) throw new AppError("Product not found", 404);
 
-        const reviews = await Review.find({ productId, deletedAt: null }).sort({ createdAt: -1 });
+    const { reviews, averageRating } = await getReviewsForProduct(productId);
 
-        const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-        const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0;
-
-        res.status(200).json({
-            success: true,
-            message: "Reviews retrieved successfully",
-            data: {
-                reviews,
-                averageRating
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
+    res.status(200).json({
+      success: true,
+      message: "Reviews retrieved successfully",
+      data: { reviews, averageRating },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const updateReview = async (req, res, next) => {

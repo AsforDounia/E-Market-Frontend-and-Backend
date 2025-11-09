@@ -4,154 +4,274 @@ import mongoose from "mongoose";
 import { AppError } from "../middlewares/errorHandler.js";
 import notificationService from "../services/notificationService.js";
 import cacheInvalidation from "../services/cacheInvalidation.js";
+import Review from "../models/Review.js"; // Import the Review model
+import { getReviewsForProduct } from "../services/reviewService.js";
 const ObjectId = mongoose.Types.ObjectId;
 
-async function getAllProducts(req, res, next) {
-    try {
-        const {
-            search,
-            category,
-            minPrice,
-            maxPrice,
-            inStock,
-            sortBy,
-            order,
-            page = 1,
-            limit = 8,
-        } = req.query;
-
-        const filter = {
-            deletedAt: null,
-            // validationStatus: 'approved',
-            // isVisible: true
-        };
-        if (req.query.seller) filter.sellerId = req.query.seller;
-        if (search)
-            filter.$or = [
-                { title: { $regex: search, $options: "i" } },
-                { description: { $regex: search, $options: "i" } },
-            ];
-        if (minPrice || maxPrice)
-            filter.price = {
-                ...(minPrice && { $gte: Number(minPrice) }),
-                ...(maxPrice && { $lte: Number(maxPrice) }),
-            };
-        if (inStock === "true") filter.stock = { $gt: 0 };
-
-        if (category) {
-            const isValidObjectId = mongoose.Types.ObjectId.isValid(category);
-            const categoryDoc = isValidObjectId
-                ? await Category.findById(category)
-                : await Category.findOne({ name: { $regex: category, $options: "i" } });
-
-            if (categoryDoc) {
-                const productCategoryLinks = await ProductCategory.find({
-                    category: categoryDoc._id,
-                });
-
-                // Récupère tous les IDs de produits liés à cette catégorie
-                const categoryProductIds = productCategoryLinks.map((pc) => pc.product.toString());
-
-                //On ajoute directement le filtre dans la requête Mongo
-                filter._id = { $in: categoryProductIds };
-            }
-        }
-
-        //tri
-        const sortOptions = {};
-
-        // Choix du champ de tri selon le paramètre "sortBy"
-        switch (sortBy) {
-            case "price":
-                sortOptions.price = order === "asc" ? 1 : -1;
-                break;
-            case "date":
-                sortOptions.createdAt = order === "asc" ? 1 : -1;
-                break;
-            default:
-                sortOptions.createdAt = -1;
-        }
-
-        //application du tri et pagination directement dans MongoDB
-        const skip = (Number(page) - 1) * Number(limit);
-
-        const filteredProducts = await Product.find(filter)
-            .sort(sortOptions)
-            .skip(skip)
-            .limit(Number(limit));
-
-        //ajout des categories à chaque produit
-        const results = await Promise.all(
-            filteredProducts.map(async (product) => {
-                const categories = await getProductCategories(product._id);
-                const imageUrls = await getProductImages(product._id);
-                return {
-                    _id: product._id,
-                    title: product.title,
-                    description: product.description,
-                    price: product.price,
-                    stock: product.stock,
-                    imageUrls: imageUrls,
-                    validationStatus: product.validationStatus,
-                    isVisible: product.isVisible,
-                    isAvailable: product.isAvailable,
-                    createdAt: product.createdAt,
-                    categories,
-                };
-            })
-        );
-
-        const totalProducts = await Product.countDocuments(filter);
-
-        // res.status(200).json(results);
-        res.status(200).json({
-            success: true,
-            message: "Products retrieved successfully",
-            metadata: {
-                total: totalProducts,
-                currentPage: Number(page),
-                totalPages: Math.ceil(totalProducts / Number(limit)),
-                pageSize: Number(limit),
-                hasNextPage: Number(page) < Math.ceil(totalProducts / Number(limit)),
-                hasPreviousPage: Number(page) > 1,
-            },
-            data: {
-                products: results,
-            },
-        });
-    } catch (err) {
-        next(err);
-    }
+function generateSlug(title) {
+    return title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "") // Remove special characters
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/--+/g, "-") // Replace multiple hyphens with single hyphen
+        .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
 }
+
+
+async function getAllProducts(req, res, next) {
+  try {
+    const {
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      inStock,
+      sortBy,
+      order,
+      page = 1,
+      limit = 8,
+      seller,
+    } = req.query;
+
+    // Base filter
+    const filter = {
+      deletedAt: null,
+      // validationStatus: 'approved',
+      // isVisible: true
+    };
+
+    // Seller filter
+    if (seller) filter.sellerId = seller;
+
+    // Search filter
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Price filter
+    if (minPrice || maxPrice) {
+      filter.price = {
+        ...(minPrice && { $gte: Number(minPrice) }),
+        ...(maxPrice && { $lte: Number(maxPrice) }),
+      };
+    }
+
+    // Stock filter
+    if (inStock === "true") filter.stock = { $gt: 0 };
+
+    // Category filter
+    if (category) {
+      const isValidObjectId = mongoose.Types.ObjectId.isValid(category);
+      const categoryDoc = isValidObjectId
+        ? await Category.findById(category)
+        : await Category.findOne({ name: { $regex: category, $options: "i" } });
+
+      if (categoryDoc) {
+        const links = await ProductCategory.find({ category: categoryDoc._id });
+        const categoryProductIds = links.map((pc) => pc.product.toString());
+        filter._id = { $in: categoryProductIds };
+      }
+    }
+
+    // Sorting logic
+    const sortOptions = {};
+    const sortByRating = sortBy === "rating";
+    if (!sortByRating) {
+      switch (sortBy) {
+        case "price":
+          sortOptions.price = order === "asc" ? 1 : -1;
+          break;
+        case "date":
+          sortOptions.createdAt = order === "asc" ? 1 : -1;
+          break;
+        default:
+          sortOptions.createdAt = -1;
+      }
+    }
+
+    // Pagination setup
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // Fetch products (without pagination if sorting by rating)
+    const filteredProducts = sortByRating
+      ? await Product.find(filter).sort({ createdAt: -1 })
+      : await Product.find(filter)
+          .sort(sortOptions)
+          .skip(skip)
+          .limit(Number(limit));
+
+    // Build final enriched result
+    let finalResults = await Promise.all(
+      filteredProducts.map(async (product) => {
+        const [categories, imageUrls, reviewData] = await Promise.all([
+          getProductCategories(product._id),
+          getProductImages(product._id),
+          getReviewsForProduct(product._id),
+        ]);
+
+        return {
+          _id: product._id,
+          slug: product.slug,
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          stock: product.stock,
+          imageUrls,
+          validationStatus: product.validationStatus,
+          isVisible: product.isVisible,
+          isAvailable: product.isAvailable,
+          createdAt: product.createdAt,
+          categories,
+          rating: {
+            average: reviewData.averageRating,
+            count: reviewData.count,
+          },
+          reviews: reviewData.reviews,
+        };
+      })
+    );
+
+    // Sort by rating if needed
+    if (sortByRating) {
+      finalResults.sort((a, b) => {
+        const diff = b.rating.average - a.rating.average;
+        return order === "asc" ? -diff : diff;
+      });
+      finalResults = finalResults.slice(skip, skip + Number(limit));
+    }
+
+    // Total count for pagination metadata
+    const totalProducts = await Product.countDocuments(filter);
+
+    // Final Response
+    res.status(200).json({
+      success: true,
+      message: "Products retrieved successfully",
+      metadata: {
+        total: totalProducts,
+        currentPage: Number(page),
+        totalPages: Math.ceil(totalProducts / Number(limit)),
+        pageSize: Number(limit),
+        hasNextPage: Number(page) < Math.ceil(totalProducts / Number(limit)),
+        hasPreviousPage: Number(page) > 1,
+      },
+      data: {
+        products: finalResults,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 async function getProductById(req, res, next) {
-    try {
-        const { id } = req.params;
-        if (!ObjectId.isValid(id)) throw new AppError("Invalid product ID", 400);
-        const product = await Product.findById(id);
-        if (!product) throw new AppError("Product not found", 404);
+  try {
+    const { id } = req.params;
 
-        const categories = await getProductCategories(product._id);
-
-        res.status(200).json({
-            success: true,
-            message: "Product retrieved successfully",
-            data: {
-                product: {
-                    _id: product._id,
-                    title: product.title,
-                    description: product.description,
-                    price: product.price,
-                    stock: product.stock,
-                    imageUrls: product.imageUrls,
-                    categories,
-                },
-            },
-        });
-    } catch (err) {
-        next(err);
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new AppError("Invalid product ID", 400);
     }
+
+    // Find product
+    const product = await Product.findById(id).where({ deletedAt: null });
+    if (!product) throw new AppError("Product not found", 404);
+
+    // Parallel queries for related data
+    const [categories, imageUrls, reviewData] = await Promise.all([
+      getProductCategories(product._id),
+      getProductImages(product._id),
+      getReviewsForProduct(product._id),
+    ]);
+
+    // Build final response object
+    const productData = {
+      _id: product._id,
+      slug: product.slug,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      imageUrls,
+      categories,
+      validationStatus: product.validationStatus,
+      isVisible: product.isVisible,
+      isAvailable: product.isAvailable,
+      rating: {
+        average: reviewData.averageRating,
+        count: reviewData.count,
+      },
+      reviews: reviewData.reviews,
+    };
+
+    // Send JSON response
+    res.status(200).json({
+      success: true,
+      message: "Product retrieved successfully",
+      data: {
+        product: productData,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 }
+
+
+async function getProductBySlug(req, res, next) {
+  try {
+    const { slug } = req.params;
+
+    // Find product by slug (and ensure it’s not deleted)
+    const product = await Product.findOne({ slug, deletedAt: null });
+    if (!product) throw new AppError("Product not found", 404);
+
+    // Fetch related data in parallel
+    const [categories, imageUrls, reviewData] = await Promise.all([
+      getProductCategories(product._id),
+      getProductImages(product._id),
+      getReviewsForProduct(product._id),
+    ]);
+
+    // Build final structured product response
+    const productData = {
+      _id: product._id,
+      slug: product.slug,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      imageUrls,
+      categories,
+      validationStatus: product.validationStatus,
+      isVisible: product.isVisible,
+      isAvailable: product.isAvailable,
+      rating: {
+        average: reviewData.averageRating,
+        count: reviewData.count,
+      },
+      reviews: reviewData.reviews,
+    };
+
+    // Send response
+    res.status(200).json({
+      success: true,
+      message: "Product retrieved successfully",
+      data: { product: productData },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 
 async function createProduct(req, res, next) {
     try {
@@ -159,9 +279,8 @@ async function createProduct(req, res, next) {
         let { title, description, price, stock, categoryIds } = req.body;
 
         // ======== PARSE CATEGORYIDS IF STRING ========
-       
 
-        if (typeof categoryIds === 'string') {
+        if (typeof categoryIds === "string") {
             try {
                 categoryIds = JSON.parse(categoryIds);
             } catch (e) {
@@ -169,9 +288,12 @@ async function createProduct(req, res, next) {
             }
         }
 
-        
         // Handle case where categoryIds is an array with a single string element
-        if (Array.isArray(categoryIds) && categoryIds.length === 1 && typeof categoryIds[0] === 'string') {
+        if (
+            Array.isArray(categoryIds) &&
+            categoryIds.length === 1 &&
+            typeof categoryIds[0] === "string"
+        ) {
             try {
                 categoryIds = JSON.parse(categoryIds[0]);
             } catch (e) {
@@ -183,21 +305,30 @@ async function createProduct(req, res, next) {
         if (!sellerId) throw new AppError("Seller information is required", 400);
         if (!title || !description || price == null || stock == null || !categoryIds)
             throw new AppError("Title, description, price, stock and categories are required", 400);
-        if (!Array.isArray(categoryIds))
-            throw new AppError("categoryIds must be an array", 400);
-        if (categoryIds.length === 0)
-            throw new AppError("At least one category is required", 400);
+        if (!Array.isArray(categoryIds)) throw new AppError("categoryIds must be an array", 400);
+        if (categoryIds.length === 0) throw new AppError("At least one category is required", 400);
         if (categoryIds.some((id) => !ObjectId.isValid(id)))
             throw new AppError("Invalid category ID", 400);
 
+        // Generate unique slug
+        let slug = generateSlug(title);
+        let slugExists = await Product.findOne({ slug });
+        let counter = 1;
+
+        // If slug exists, append number until we find unique slug
+        while (slugExists) {
+            slug = `${generateSlug(title)}-${counter}`;
+            slugExists = await Product.findOne({ slug });
+            counter++;
+        }
         // ======== CREATE PRODUCT ========
         const product = await Product.create({
+            slug,
             title,
             description,
             price,
             stock,
             sellerId,
-            imageUrls: [],
         });
 
         // ======== ADD CATEGORIES ========
@@ -348,8 +479,8 @@ async function updateProductVisibility(req, res, next) {
             success: true,
             message: `Product ${isVisible ? "shown" : "hidden"} successfully`,
             data: {
-                product
-            }
+                product,
+            },
         });
     } catch (error) {
         next(error);
@@ -365,10 +496,10 @@ async function getPendingProducts(req, res, next) {
 
         res.json({
             success: true,
-            message: 'Pending products retrieved successfully',
+            message: "Pending products retrieved successfully",
             data: {
-                products
-            }
+                products,
+            },
         });
     } catch (error) {
         next(error);
@@ -407,8 +538,8 @@ async function validateProduct(req, res, next) {
             success: true,
             message: "Product approved successfully",
             data: {
-                product
-            }
+                product,
+            },
         });
     } catch (error) {
         next(error);
@@ -444,8 +575,8 @@ async function rejectProduct(req, res, next) {
             success: true,
             message: "Product rejected successfully",
             data: {
-                product
-            }
+                product,
+            },
         });
     } catch (error) {
         next(error);
@@ -455,6 +586,7 @@ async function rejectProduct(req, res, next) {
 export {
     getAllProducts,
     getProductById,
+    getProductBySlug,
     createProduct,
     updateProduct,
     deleteProduct,

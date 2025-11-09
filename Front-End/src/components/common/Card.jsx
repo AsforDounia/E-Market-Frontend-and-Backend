@@ -2,7 +2,8 @@ const Card = ({
   children, 
   hover = false,
   padding = 'md',
-  className = '' 
+  className = '',
+  onClick
 }) => {
   const paddings = {
     none: '',
@@ -18,6 +19,7 @@ const Card = ({
   return (
     <div 
       className={`bg-white rounded-xl shadow-md overflow-hidden ${hoverEffect} ${paddings[padding]} ${className}`}
+      onClick={onClick}
     >
       {children}
     </div>
