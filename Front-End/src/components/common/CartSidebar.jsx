@@ -5,14 +5,33 @@ import { Link } from "react-router-dom";
 const CartSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const cartTotal = 0.0; // replace with real total
-  const cartItems = []; // replace with real items
+  const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+  const cartTotal = cartItems.reduce((total, item) => {
+    return total + (item.price * item.quantity);
+  }, 0);
 
+  const baseUrl = import.meta.env.VITE_API_URL.replace("/api/v2", "");
+
+  
   // Disable scroll when sidebar is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
 
+const getImageUrl = (images) => {
+  if (!images || images.length === 0) return logo;
+  
+  const primaryImage = images.find(img => img.isPrimary);
+  const imageUrl = primaryImage ? primaryImage.imageUrl : images[0].imageUrl;
+
+  if (imageUrl.startsWith('http')) {
+    return imageUrl;
+  }
+
+  return `${baseUrl}${imageUrl}`;
+};
+  
+  
   return (
     <>
       {/* --- Trigger Button --- */}
@@ -61,11 +80,14 @@ const CartSidebar = () => {
           ) : (
             cartItems.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="flex items-center justify-between mb-4 border-b pb-3"
               >
+                <img src={getImageUrl(item.imageUrls)} alt={item.name}
+                  className="w-16 h-16 object-cover rounded-md"
+                />
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-800">{item.name}</span>
+                  <span className="text-sm font-medium text-gray-800">{item.title}</span>
                   <span className="text-xs text-gray-500">
                     {item.quantity} × {item.price.toFixed(2)} €
                   </span>
