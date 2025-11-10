@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Avatar, Button, Dropdown, DropdownItem, LogoWithText } from '../common';
 import { AiOutlineUser, AiOutlineLogout } from 'react-icons/ai';
+import { FcHome } from 'react-icons/fc';
 
 const Header = () => {
   const { isAuthenticated, user } = useAuth();
@@ -36,13 +37,21 @@ const Header = () => {
                   }
                   position="right"
                 >
-                  <DropdownItem 
+                {location.pathname === '/profile' ? (
+                  <DropdownItem
+                    icon={<FcHome className="w-5 h-5" />}
+                    onClick={() => window.location.href = '/'}
+                  >
+                    Accueil
+                  </DropdownItem>
+                ):(
+                  <DropdownItem
                     icon={<AiOutlineUser className="w-5 h-5" />}
                     onClick={() => window.location.href = '/profile'}
                   >
                     Mon Profil
                   </DropdownItem>
-                  
+                )}
                   <div className="border-t border-gray-200 my-1"></div>
                   
                   <DropdownItem 
@@ -58,7 +67,7 @@ const Header = () => {
               <>
                 {isAuthPage ? (
                   <Link to="/">
-                    <Button size="md">Accueil</Button>
+                    <Button size="md" className='flex items-center gap-2'><FcHome />Accueil</Button>
                   </Link>
                 ) : (
                   <>

@@ -312,7 +312,7 @@ const Profile = () => {
                   <div className="text-center py-12">
                     <AiOutlineShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 mb-4">Vous n'avez pas encore passé de commande</p>
-                    <Button onClick={() => navigate('/')}>
+                    <Button onClick={() => navigate('/products')}>
                       Découvrir nos produits
                     </Button>
                   </div>
