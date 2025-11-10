@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Avatar, Button, Dropdown, DropdownItem, LogoWithText } from '../common';
-import { AiOutlineUser, AiOutlineLogout } from 'react-icons/ai';
+import { AiOutlineUser, AiOutlineLogout, AiOutlineShoppingCart } from 'react-icons/ai';
 import { FcHome } from 'react-icons/fc';
+import CartSidebar from '../common/CartSidebar';
 
 const Header = () => {
   const { isAuthenticated, user } = useAuth();
@@ -20,11 +21,21 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+              {/* <Link
+                className="relative flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-all"
+              >
+                <AiOutlineShoppingCart className="w-6 h-6" />
+                <div className="hidden md:flex flex-col items-start">
+                  <span className="text-xs text-gray-500">Panier</span>
+                  <span className="text-sm font-semibold">0.00 €</span>
+                </div>
+              </Link> */}
+              <CartSidebar />
             {isAuthenticated ? (
               <>
-                <span className="text-gray-700 hidden md:block">
+                {/* <span className="text-gray-700 hidden md:block">
                   Bonjour, {user?.fullname}
-                </span>
+                </span> */}
                 
                 <Dropdown 
                   trigger={
@@ -83,6 +94,7 @@ const Header = () => {
                 )}
               </>
             )}
+
           </div>
         </div>
       </nav>

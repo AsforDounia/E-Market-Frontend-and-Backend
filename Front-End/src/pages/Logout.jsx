@@ -5,8 +5,12 @@ import { useAuth } from "../hooks/useAuth";
 const Logout = () => {
   const { logout } = useAuth();
 
-  useEffect( async () => {
-    await logout();
+  useEffect(() => {
+    const handleLogout = async () => {
+      await logout();
+    };
+
+    handleLogout();
   }, [logout]);
 
   return null;

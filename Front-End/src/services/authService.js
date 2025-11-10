@@ -14,7 +14,16 @@ export const login = async (credentials) => {
 // Fonction de déconnexion
 export const logout = async () => {
   try {
-    const response = await api.post('/auth/logout');
+    const token = localStorage.getItem('token');
+    const response = await api.post(
+      '/auth/logout',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     return response.data;
   } catch (error) {
     console.error('Logout error:', error);
