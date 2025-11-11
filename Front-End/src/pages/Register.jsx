@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -32,6 +32,7 @@ const Register = () => {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
   const [registerError, setRegisterError] = useState(null);
+  const formContainerRef = useRef(null);
 
   const {
     register,
@@ -60,10 +61,19 @@ const Register = () => {
   };
 
   const switchTab = (value) => {
+    setRegisterError(null);
     if (value === "login") {
       navigate("/login");
     }
   };
+
+
+  useEffect(() => {
+    if (registerError && formContainerRef.current) {
+      formContainerRef.current.scrollTop = 0;
+    }
+  }, [registerError]);
+
 
   const tabs = [
     { label: "Connexion", value: "login" },
@@ -95,7 +105,7 @@ const Register = () => {
         </div>
 
         {/* Register Form */}
-        <div className="p-12 max-h-[82vh] overflow-y-auto pt-6">
+        <div ref={formContainerRef}  className="p-12 max-h-[82vh] overflow-y-auto pt-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Inscription</h1>
             <p className="text-gray-600 text-sm">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -17,9 +17,11 @@ const loginSchema = yup.object().shape({
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState("login");
-  const { login, error: authError } = useAuth(); // Get error from context
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [loginError, setLoginError] = useState(null);
+  const formContainerRef = useRef(null);
+
 
   const {
     register,
@@ -44,6 +46,7 @@ const Login = () => {
   };
 
   const switchTab = (value) => {
+    setLoginError(null);
     if (value === "register") {
       navigate("/register");
     }
@@ -54,6 +57,11 @@ const Login = () => {
     { label: "Inscription", value: "register" },
   ];
 
+  useEffect(() => {
+    if (loginError && formContainerRef.current) {
+      formContainerRef.current.scrollTop = 0;
+    }
+  }, [loginError]);
   return (
     <div className="min-h-max max-h-max bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-12">
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full grid md:grid-cols-2 max-h-[78.3vh]">
@@ -84,7 +92,7 @@ const Login = () => {
         </div>
 
         {/* Login Form */}
-        <div className="p-12 overflow-y-auto pt-6">
+        <div ref={formContainerRef} className="p-12 overflow-y-auto pt-6 max-h-[82vh]">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Connexion</h1>
             <p className="text-gray-600 text-sm">
@@ -103,8 +111,11 @@ const Login = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Show error message */}
-              {(loginError || authError) && (
-                <Alert type="error" message={loginError || authError} />
+              {(loginError) && (
+                <Alert
+                  type="error"
+                  message={loginError}
+                />
               )}
 
               {/* Email Field */}

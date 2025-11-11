@@ -1,581 +1,491 @@
-# E-Market-API
+# 🛒 **E-Market – Frontend React**
 
-## 📋 Description
+## 📋 **Vue d'ensemble**
 
-E-Market-API est une plateforme e-commerce complète et sécurisée permettant aux entreprises de créer leur marketplace en ligne. Cette API REST avancée offre une gestion complète des utilisateurs multi-rôles, produits, commandes, paiements et notifications avec une architecture moderne et performante basée sur Node.js et MongoDB.
+E-Market Frontend est une application e-commerce moderne développée avec **React 18 + Vite**. Elle offre une interface utilisateur intuitive et responsive pour la gestion complète d'un compte utilisateur, la navigation des produits et le suivi des commandes.
 
-## 🚀 Fonctionnalités
+---
 
-### 🔐 Authentification & Autorisation
+## ⚙️ **Technologies utilisées**
 
-- **Système JWT** : Authentification sécurisée avec tokens
-- **Gestion des rôles** : user, seller, admin avec permissions spécifiques
-- **Protection des routes** : Middleware d'autorisation par rôle
+| Catégorie            | Outil                                      |
+| -------------------- | ------------------------------------------ |
+| **Framework**        | React 18 + Vite                            |
+| **Styling**          | TailwindCSS                                |
+| **Routing**          | React Router DOM v6                        |
+| **State Management** | Context API (AuthContext)                  |
+| **HTTP Client**      | Axios                                      |
+| **Authentification** | JWT (stockage localStorage)                |
+| **Icons**            | React Icons (AI icons)                     |
+| **Build Tool**       | Vite                                       |
+| **Linting**          | ESLint                                     |
 
-### 👥 Gestion des utilisateurs
+---
 
-- **Inscription/Connexion** : Système complet d'authentification
-- **Profils utilisateurs** : Gestion et modification des profils
-- **Promotion de rôles** : Admin peut promouvoir user → seller
-
-### 🛍️ Espace vendeurs
-
-- **Gestion des produits** : CRUD complet pour les sellers
-- **Upload d'images** : Multer + Sharp pour compression/optimisation
-- **Images multiples** : Support de plusieurs images par produit
-- **Gestion du stock** : Suivi de disponibilité en temps réel
-
-### 🔍 Catalogue & Recherche
-
-- **Recherche avancée** : Par mots-clés, catégorie, prix
-- **Filtrage & tri** : Prix, popularité, date
-- **Pagination performante** : Navigation optimisée
-- **Cache mémoire** : Optimisation des requêtes fréquentes
-
-### 🛒 Panier & Commandes
-
-- **Gestion du panier** : Ajout/modification/suppression d'articles
-- **Validation de commandes** : Vérification stock + création commande
-- **Suivi des statuts** : pending, paid, shipped, delivered, cancelled
-- **Paiement simulé** : Système de paiement intégré
-
-### 🎫 Système de coupons
-
-- **Codes promo** : Création et gestion de coupons
-- **Types de réduction** : Montant fixe ou pourcentage
-- **Conditions d'usage** : Montant minimum, date d'expiration
-
-### ⭐ Avis & Notations
-
-- **Système d'avis** : Notes et commentaires sur produits
-- **Modération** : Validation par administrateurs
-- **Un avis par produit** : Limitation par utilisateur
-
-### 🔔 Notifications (🆕)
-
-- **Système asynchrone** : EventEmitter pour notifications temps réel
-- **Types de notifications** : Nouveaux produits, commandes, statuts
-- **Gestion des notifications** : Lecture/non-lu, historique
-
-### 📊 Logging & Monitoring (🆕)
-
-- **Winston** : Système de logs avancé
-- **Rotation automatique** : Gestion des fichiers de logs
-- **Logs admin** : Interface de consultation des logs
-
-### 🧪 Tests & Qualité
-
-- **Tests automatisés** : Mocha + Chai + Supertest
-- **Couverture de code** : Rapport avec nyc
-- **Tests d'intégration** : Validation complète des workflows
-
-### 🔧 Outils & Automatisation (🆕)
-
-- **Scripts de seed** : Génération de données de test avec Faker.js
-- **Reset database** : Réinitialisation complète
-- **Versioning API** : Support de versions multiples
-
-## 🛠️ Technologies utilisées
-
-### Core
-
-- **Backend** : Node.js, Express.js
-- **Base de données** : MongoDB avec Mongoose
-- **Authentification** : JWT, bcrypt
-
-### Sécurité
-
-- **Protection** : helmet, cors, express-rate-limit
-- **Validation** : Joi / express-validator
-- **Variables d'environnement** : dotenv
-
-### Upload & Media
-
-- **Upload de fichiers** : Multer
-- **Traitement d'images** : Sharp (compression/optimisation)
-
-### Logging & Monitoring
-
-- **Logs** : Winston
-- **Rotation des logs** : winston-daily-rotate-file
-
-### Tests
-
-- **Framework de tests** : Mocha + Chai + Supertest
-- **Couverture** : nyc
-
-### Développement
-
-- **Documentation** : Swagger UI
-- **Données de test** : Faker.js
-- **Développement** : Nodemon
-
-## 📁 Structure du projet
+## 📁 **Structure du projet**
 
 ```
-E-Market-API/
-├── config/
-│   ├── database.js          # Configuration MongoDB
-│   └── jwt.js               # Configuration JWT
-├── controllers/
-│   ├── authController.js    # Authentification
-│   ├── categoryController.js # Logique métier catégories
-│   ├── productController.js  # Logique métier produits
-│   ├── userController.js     # Logique métier utilisateurs
-│   ├── cartController.js     # Gestion du panier
-│   ├── orderController.js    # Gestion des commandes
-│   ├── couponController.js   # Gestion des coupons
-│   ├── reviewController.js   # Gestion des avis
-│   └── notificationController.js # Notifications
-├── middlewares/
-│   ├── auth/
-│   │   ├── authenticate.js   # Middleware JWT
-│   │   └── authorize.js      # Middleware rôles
-│   ├── validation/
-│   │   ├── schemas/          # Schémas de validation
-│   │   └── validate.js       # Middleware de validation
-│   ├── upload/
-│   │   └── multer.js         # Configuration upload
-│   ├── cache.js             # Middleware de cache
-│   ├── rateLimiter.js       # Limitation de taux
-│   ├── errorHandler.js       # Gestionnaire d'erreurs global
-│   ├── logger.js            # Middleware de logging
-│   └── notFound.js          # Middleware 404
-├── models/
-│   ├── User.js              # Modèle User (avec rôles)
-│   ├── Product.js           # Modèle Product (avec seller)
-│   ├── Category.js          # Modèle Category
-│   ├── Cart.js              # Modèle Panier
-│   ├── Order.js             # Modèle Commande
-│   ├── Coupon.js            # Modèle Coupon
-│   ├── Review.js            # Modèle Avis
-│   └── Notification.js      # Modèle Notification
-├── routes/
-│   ├── api/
-│   │   └── v1/              # Versioning API
-│   │       ├── auth.js      # Routes authentification
-│   │       ├── users.js     # Routes utilisateurs
-│   │       ├── products.js  # Routes produits
-│   │       ├── categories.js # Routes catégories
-│   │       ├── cart.js      # Routes panier
-│   │       ├── orders.js    # Routes commandes
-│   │       ├── coupons.js   # Routes coupons
-│   │       ├── reviews.js   # Routes avis
-│   │       ├── notifications.js # Routes notifications
-│   │       └── admin.js     # Routes admin
-├── services/
-│   ├── authService.js       # Services authentification
-│   ├── productService.js    # Services produits
-│   ├── orderService.js      # Services commandes
-│   ├── couponService.js     # Services coupons
-│   ├── notificationService.js # Services notifications
-│   └── imageService.js      # Services images (Sharp)
-├── events/
-│   └── eventEmitter.js      # Gestionnaire d'événements
-├── utils/
-│   ├── logger.js            # Configuration Winston
-│   ├── cache.js             # Utilitaires cache
-│   └── helpers.js           # Fonctions utilitaires
-├── tests/
-│   ├── unit/                # Tests unitaires
-│   ├── integration/         # Tests d'intégration
-│   └── fixtures/            # Données de test
-├── scripts/
-│   ├── seed.js              # Script de seed
-│   └── reset-db.js          # Reset database
-├── uploads/                 # Dossier des images uploadées
-├── logs/                    # Dossier des logs
-├── swagger/
-│   └── swagger.js           # Configuration Swagger
-└── server.js                # Point d'entrée de l'application
+Front-End/
+├── public/                      # Fichiers statiques
+├── src/
+│   ├── assets/
+│   │   └── images/             # Images et ressources
+│   │
+│   ├── components/
+│   │   ├── common/             # Composants réutilisables
+│   │   │   ├── Alert.jsx       # Messages de feedback
+│   │   │   ├── Avatar.jsx      # Photo de profil
+│   │   │   ├── Badge.jsx       # Badges de statut
+│   │   │   ├── Button.jsx      # Boutons avec états
+│   │   │   ├── Card.jsx        # Cartes produits/info
+│   │   │   ├── Input.jsx       # Champs de saisie
+│   │   │   ├── PasswordInput.jsx  # Champ mot de passe
+│   │   │   ├── LoadingSpinner.jsx # Indicateurs de chargement
+│   │   │   └── Tabs.jsx        # Navigation par onglets
+│   │   │
+│   │   └── layout/             # Composants de mise en page
+│   │       ├── Header.jsx      # Navigation principale
+│   │       └── Footer.jsx      # Pied de page
+│   │
+│   ├── context/
+│   │   └── AuthContext.jsx     # Gestion globale de l'authentification
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.js          # Hook d'authentification
+│   │   └── useFetch.js         # Hook pour les appels API
+│   │
+│   ├── pages/
+│   │   ├── Home.jsx            # Page d'accueil
+│   │   ├── Login.jsx           # Page de connexion
+│   │   ├── Register.jsx        # Page d'inscription
+│   │   ├── Logout.jsx          # Page de déconnexion
+│   │   ├── Profile.jsx         # Profil utilisateur complet
+│   │   ├── ProductDetails.jsx  # Détails d'un produit
+│   │   └── NotFound.jsx        # Page 404
+│   │
+│   ├── routes/                 # Configuration des routes
+│   │
+│   ├── services/
+│   │   └── api.js              # Configuration Axios
+│   │
+│   ├── App.jsx                 # Composant principal
+│   ├── App.css                 # Styles globaux
+│   ├── main.jsx                # Point d'entrée
+│   └── index.css               # Styles Tailwind
+│
+├── index.html
+├── package.json
+├── vite.config.js
+├── eslint.config.js
+└── README.md
 ```
 
-## ⚙️ Installation
+---
 
-### Prérequis
+## ✅ **Fonctionnalités implémentées**
 
-- Node.js (version 14 ou supérieure)
-- MongoDB (local ou Atlas)
+### 🔐 **Authentification complète**
+
+- ✅ **Page de connexion** ([`Login.jsx`](src/pages/Login.jsx))
+  - Formulaire avec validation en temps réel
+  - Messages d'erreur contextuels
+  - Redirection automatique après connexion
+  
+- ✅ **Page d'inscription** ([`Register.jsx`](src/pages/Register.jsx))
+  - Validation des champs (email, mot de passe, confirmation)
+  - Sélection du rôle (Acheteur/Vendeur)
+  - Feedback visuel immédiat
+  
+- ✅ **Déconnexion sécurisée** ([`Logout.jsx`](src/pages/Logout.jsx))
+  - Nettoyage du localStorage
+  - Redirection vers la page de connexion
+  
+- ✅ **Gestion des sessions** via [`AuthContext`](src/context/AuthContext.jsx)
+  - État global de l'utilisateur
+  - Persistance de la session
+  - Vérification automatique du token
+  - Protection des routes privées
+
+### 👤 **Profil utilisateur avancé**
+
+La page [`Profile.jsx`](src/pages/Profile.jsx) offre une interface complète avec **navigation par onglets** :
+
+#### 📊 **Onglet Informations personnelles**
+- ✅ Affichage et modification du nom complet
+- ✅ Modification de l'email
+- ✅ Upload d'avatar avec prévisualisation
+- ✅ Affichage du rôle utilisateur (badge coloré)
+- ✅ Sauvegarde des modifications avec feedback
+
+#### 🔒 **Onglet Sécurité**
+- ✅ Changement de mot de passe
+- ✅ Validation de l'ancien mot de passe
+- ✅ Vérification de la correspondance (nouveau/confirmation)
+- ✅ Affichage/masquage du mot de passe
+- ✅ Messages de succès/erreur
+
+#### 📦 **Onglet Mes commandes**
+- ✅ Liste complète des commandes passées
+- ✅ Badges de statut colorés :
+  - 🟡 En attente (jaune)
+  - 🔵 En cours (bleu)
+  - 🟣 Expédié (violet)
+  - 🟢 Livré (vert)
+  - 🔴 Annulé (rouge)
+- ✅ Détails des commandes (articles, quantités, prix)
+- ✅ Calcul du total par commande
+- ✅ Date de commande formatée
+- ✅ État vide géré ("Aucune commande")
+
+### 🏠 **Navigation et pages**
+
+| Page                    | Route             | Description                              |
+| ----------------------- | ----------------- | ---------------------------------------- |
+| **Home**                | `/`               | Page d'accueil avec liste des produits   |
+| **Login**               | `/login`          | Formulaire de connexion                  |
+| **Register**            | `/register`       | Formulaire d'inscription                 |
+| **Profile**             | `/profile`        | Profil utilisateur avec onglets          |
+| **Product Details**     | `/products/:id`   | Détails d'un produit                     |
+| **Logout**              | `/logout`         | Page de déconnexion                      |
+| **404 Not Found**       | `*`               | Page d'erreur pour routes inexistantes   |
+
+### 🧩 **Composants réutilisables**
+
+#### **Alert** (`components/common/Alert.jsx`)
+- Messages de succès/erreur/warning
+- Auto-fermeture optionnelle
+- Variantes colorées (success, error, warning, info)
+
+#### **Avatar** (`components/common/Avatar.jsx`)
+- Affichage de la photo de profil
+- Fallback avec initiales si pas d'image
+- Tailles configurables (sm, md, lg)
+
+#### **Badge** (`components/common/Badge.jsx`)
+- Badges colorés pour les statuts
+- Variantes : primary, secondary, success, danger, warning, info
+- Utilisé pour les rôles et statuts de commandes
+
+#### **Button** (`components/common/Button.jsx`)
+- Boutons avec états de chargement
+- Variantes : primary, secondary, danger, outline
+- Tailles : sm, md, lg
+- Support des icônes
+
+#### **Card** (`components/common/Card.jsx`)
+- Cartes avec effets hover
+- Utilisées pour les produits et sections
+- Responsive
+
+#### **Input** (`components/common/Input.jsx`)
+- Champs de saisie avec label
+- Validation en temps réel
+- Messages d'erreur intégrés
+- Support des types variés (text, email, number, etc.)
+
+#### **PasswordInput** (`components/common/PasswordInput.jsx`)
+- Champ spécifique pour les mots de passe
+- Toggle affichage/masquage
+- Validation intégrée
+- Indicateur de force (optionnel)
+
+#### **LoadingSpinner** (`components/common/LoadingSpinner.jsx`)
+- Indicateurs de chargement
+- Utilisés pendant les requêtes API
+- Variantes : spinner, dots, pulse
+
+#### **Tabs** (`components/common/Tabs.jsx`)
+- Navigation par onglets
+- Active tab avec style distinct
+- Responsive
+
+### 🪝 **Custom Hooks**
+
+#### **useAuth** (`hooks/useAuth.js`)
+```javascript
+const { user, isAuthenticated, login, logout, updateUser } = useAuth();
+```
+- Accès simplifié au contexte d'authentification
+- Méthodes pour login/logout
+- État utilisateur et authentification
+
+#### **useFetch** (`hooks/useFetch.js`)
+```javascript
+const { data, loading, error } = useFetch('/api/endpoint');
+```
+- Gestion simplifiée des appels API
+- États de chargement et erreurs
+- Rechargement automatique
+
+---
+
+## 🔗 **Services API**
+
+### **Configuration principale** (`services/api.js`)
+
+```javascript
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3000/api',
+  headers: { 
+    'Content-Type': 'application/json' 
+  }
+});
+
+// Intercepteur pour ajouter le token JWT automatiquement
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Gestion des erreurs globales
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Déconnexion automatique si token invalide
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+### **Endpoints utilisés**
+
+```javascript
+// Authentification
+POST   /api/auth/login          // Connexion
+POST   /api/auth/register       // Inscription
+POST   /api/auth/logout         // Déconnexion
+
+// Utilisateur
+GET    /api/users/profile       // Récupérer le profil
+PUT    /api/users/profile       // Modifier le profil
+PUT    /api/users/profile/password  // Changer le mot de passe
+
+// Produits
+GET    /api/products            // Liste des produits
+GET    /api/products/:id        // Détails d'un produit
+
+// Commandes
+GET    /api/orders              // Liste des commandes de l'utilisateur
+GET    /api/orders/:id          // Détails d'une commande
+```
+
+---
+
+## 🎨 **Design & UX**
+
+### **Palette de couleurs**
+
+- **Primary** : Bleu (#3B82F6)
+- **Secondary** : Violet (#8B5CF6)
+- **Success** : Vert (#10B981)
+- **Danger** : Rouge (#EF4444)
+- **Warning** : Jaune (#F59E0B)
+- **Info** : Cyan (#06B6D4)
+
+### **Principes UX**
+
+- ✅ Design **mobile-first** et entièrement responsive
+- ✅ Animations et transitions fluides (Tailwind transitions)
+- ✅ États de chargement pour toutes les actions asynchrones
+- ✅ Messages de feedback utilisateur clairs (Alert)
+- ✅ Validation en temps réel des formulaires
+- ✅ Navigation intuitive avec breadcrumbs
+- ✅ Accessibilité (labels, aria-labels, contraste)
+
+### **Composants visuels**
+
+- Cards avec effets hover et shadow
+- Badges colorés pour les statuts
+- Boutons avec états disabled et loading
+- Formulaires avec validation visuelle
+- Navigation par onglets claire
+- Avatar avec fallback élégant
+
+---
+
+## 🚀 **Installation & Lancement**
+
+### **Prérequis**
+
+- Node.js v16+
 - npm ou yarn
 
-### Étapes d'installation
+### **Installation**
 
-1. **Cloner le repository**
+```powershell
+# 1️⃣ Naviguer dans le dossier Frontend
+cd Front-End
 
-    ```bash
-    git clone https://github.com/AsforDounia/E-Market-API.git
-    cd E-Market-API
-    ```
-
-2. **Installer les dépendances**
-
-    ```bash
-    npm install
-    ```
-
-3. **Configuration de l'environnement**
-
-    ```bash
-    cp ".env.example" .env
-    ```
-
-    Modifier le fichier `.env` :
-
-    ```env
-    # Database
-    MONGO_URI=mongodb://localhost:27017/emarket
-
-    # Server
-    PORT=3000
-    NODE_ENV=development
-
-    # JWT
-    JWT_SECRET=your_super_secret_jwt_key
-    JWT_EXPIRE=7d
-
-    # Upload
-    MAX_FILE_SIZE=5000000
-    UPLOAD_PATH=./uploads
-
-    # Rate Limiting
-    RATE_LIMIT_WINDOW=15
-    RATE_LIMIT_MAX_REQUESTS=100
-    ```
-
-4. **Créer les dossiers nécessaires**
-
-    ```bash
-    mkdir uploads logs
-    ```
-
-5. **Initialiser la base de données**
-
-    ```bash
-    # Réinitialiser la base (optionnel)
-    npm run reset-db
-
-    # Insérer les données de test
-    npm run seed
-    ```
-
-6. **Démarrer l'application**
-
-    ```bash
-    # Mode développement
-    npm run dev
-
-    # Mode production
-    npm start
-
-    # Lancer les tests
-    npm test
-
-    # Rapport de couverture
-    npm run coverage
-    ```
-
-## 📚 Documentation API
-
-### Accès à la documentation
-
-Une fois l'application démarrée, accédez à la documentation Swagger :
-
-```
-http://localhost:3000/api-docs
+# 2️⃣ Installer les dépendances
+npm install
 ```
 
-### Endpoints principaux
+### **Configuration**
 
-#### 🔐 Authentification
+Créer un fichier `.env` à la racine de `Front-End/` :
 
-- `POST /api/v1/auth/register` - Inscription utilisateur
-- `POST /api/v1/auth/login` - Connexion utilisateur
-- `GET /api/v1/auth/profile` - Profil utilisateur (protégé)
-- `PUT /api/v1/auth/profile` - Modifier profil (protégé)
-
-#### 👥 Utilisateurs
-
-- `GET /api/v1/users` - Liste utilisateurs (admin)
-- `GET /api/v1/users/:id` - Détails utilisateur
-- `PUT /api/v1/users/:id/role` - Modifier rôle (admin)
-- `DELETE /api/v1/users/:id` - Supprimer utilisateur (admin)
-
-#### 🛍️ Produits
-
-- `GET /api/v1/products` - Liste produits (pagination, filtres)
-- `GET /api/v1/products/:id` - Détails produit
-- `POST /api/v1/products` - Créer produit (seller)
-- `PUT /api/v1/products/:id` - Modifier produit (seller/admin)
-- `DELETE /api/v1/products/:id` - Supprimer produit (seller/admin)
-- `POST /api/v1/products/:id/images` - Upload images (seller)
-
-#### 📂 Catégories
-
-- `GET /api/v1/categories` - Liste catégories
-- `GET /api/v1/categories/:id` - Détails catégorie
-- `POST /api/v1/categories` - Créer catégorie (admin)
-- `PUT /api/v1/categories/:id` - Modifier catégorie (admin)
-- `DELETE /api/v1/categories/:id` - Supprimer catégorie (admin)
-
-#### 🛒 Panier & Commandes
-
-- `GET /api/v1/cart` - Voir panier (protégé)
-- `POST /api/v1/cart/items` - Ajouter au panier (protégé)
-- `PUT /api/v1/cart/items/:id` - Modifier quantité (protégé)
-- `DELETE /api/v1/cart/items/:id` - Retirer du panier (protégé)
-- `POST /api/v1/orders` - Créer commande (protégé)
-- `GET /api/v1/orders` - Mes commandes (protégé)
-- `GET /api/v1/orders/:id` - Détails commande (protégé)
-- `PUT /api/v1/orders/:id/status` - Modifier statut (seller/admin)
-
-#### 🎫 Coupons
-
-- `GET /api/v1/coupons` - Liste coupons (admin)
-- `POST /api/v1/coupons` - Créer coupon (admin)
-- `POST /api/v1/coupons/validate` - Valider coupon (protégé)
-- `PUT /api/v1/coupons/:id` - Modifier coupon (admin)
-- `DELETE /api/v1/coupons/:id` - Supprimer coupon (admin)
-
-#### ⭐ Avis
-
-- `GET /api/v1/products/:id/reviews` - Avis d'un produit
-- `POST /api/v1/products/:id/reviews` - Créer avis (protégé)
-- `PUT /api/v1/reviews/:id` - Modifier avis (protégé)
-- `DELETE /api/v1/reviews/:id` - Supprimer avis (protégé/admin)
-
-#### 🔔 Notifications
-
-- `GET /api/v1/notifications` - Mes notifications (protégé)
-- `PATCH /api/v1/notifications/:id/read` - Marquer comme lu (protégé)
-
-#### 🔧 Administration
-
-- `GET /api/v1/admin/logs` - Consulter logs (admin)
-- `GET /api/v1/admin/stats` - Statistiques (admin)
-
-## 🧪 Tests
-
-### Tests automatisés
-
-Le projet inclut une suite complète de tests :
-
-```bash
-# Lancer tous les tests
-npm test
-
-# Tests avec couverture
-npm run coverage
-
-# Tests en mode watch
-npm run test:watch
+```env
+VITE_API_URL=http://localhost:3000/api
 ```
 
-### Tests avec Postman
+### **Commandes disponibles**
 
-Une collection Postman est disponible dans le dossier `postman/` :
+```powershell
+# Lancer le serveur de développement
+npm run dev
 
-1. **Import de la collection**
-    - Ouvrir Postman
-    - Importer `E-Market-API.postman_collection.json`
-    - Importer `E-Market-API.postman_environment.json`
+# Build pour la production
+npm run build
 
-2. **Configuration**
-    - Variable `{{api}}` : `http://localhost:3000/api/v1`
-    - Variable `{{token}}` : Sera automatiquement définie après login
+# Prévisualiser le build de production
+npm run preview
 
-3. **Workflow de test**
-    - Commencer par "Auth > Register" ou "Auth > Login"
-    - Le token JWT sera automatiquement sauvegardé
-    - Tester les autres endpoints protégés
+# Linter le code
+npm run lint
+```
 
-### Couverture de tests
+Le projet démarre sur : 👉 **[http://localhost:5173](http://localhost:5173)**
 
-Objectif : > 70% de couverture de code
+---
 
-- Tests unitaires pour les services et utilitaires
-- Tests d'intégration pour les endpoints API
-- Tests de sécurité pour l'authentification et autorisation
+## 🔄 **Flux d'authentification**
 
-## 📊 Modèles de données
+```mermaid
+graph TD
+    A[Utilisateur arrive sur /login] --> B[Saisie credentials]
+    B --> C[Soumission du formulaire]
+    C --> D[authService.login]
+    D --> E{Succès?}
+    E -->|Oui| F[Sauvegarde token localStorage]
+    F --> G[AuthContext mis à jour]
+    G --> H[Redirection vers /products]
+    E -->|Non| I[Affichage erreur]
+    I --> B
+    H --> J[Requêtes API avec token JWT]
+```
 
-### User
+---
 
-```javascript
+## 📊 **État actuel du projet**
+
+| Module                              | État | Description                               |
+| ----------------------------------- | ---- | ----------------------------------------- |
+| ⚙️ Configuration React + Vite        | ✅    | Projet initialisé avec Vite              |
+| 🎨 TailwindCSS                      | ✅    | Configuration complète                    |
+| 🧭 React Router DOM                 | ✅    | Navigation avec routes protégées          |
+| 🔐 Authentification JWT             | ✅    | Login, Register, Logout fonctionnels      |
+| 👤 Profil utilisateur               | ✅    | Modification infos, mot de passe, avatar  |
+| 📦 Commandes utilisateur            | ✅    | Affichage historique avec statuts         |
+| 🧩 Composants UI                    | ✅    | 9+ composants réutilisables               |
+| 🪝 Custom Hooks                     | ✅    | useAuth, useFetch                         |
+| 🔗 Services API                     | ✅    | Axios configuré avec intercepteurs        |
+| 📱 Responsive Design                | ✅    | Mobile, Tablet, Desktop                   |
+| ♿ Accessibilité                    | ✅    | Labels, ARIA, contraste                   |
+| 🎭 Animations                       | ✅    | Transitions Tailwind                      |
+
+---
+
+## 🚧 **Prochaines fonctionnalités (Frontend)**
+
+- [ ] **Panier d'achat**
+  - Ajout/suppression de produits
+  - Mise à jour des quantités
+  - Calcul du total en temps réel
+  
+- [ ] **Page Produits avancée**
+  - Filtres par catégorie, prix, note
+  - Recherche en temps réel
+  - Pagination/scroll infini
+  
+- [ ] **Système de favoris/Wishlist**
+  - Ajout aux favoris
+  - Page dédiée
+  
+- [ ] **Notifications en temps réel**
+  - WebSocket pour les notifications
+  - Centre de notifications
+  
+- [ ] **Reviews & Ratings**
+  - Ajouter un avis sur un produit
+  - Système de notation (étoiles)
+  
+- [ ] **Dashboard vendeur** (si rôle = vendeur)
+  - Gestion des produits
+  - Statistiques de ventes
+  
+- [ ] **Tests**
+  - Tests unitaires (Vitest)
+  - Tests d'intégration (React Testing Library)
+  - Tests E2E (Cypress)
+
+---
+
+## 📦 **Dépendances principales**
+
+```json
 {
-  fullname: String (requis),
-  email: String (requis, unique),
-  password: String (requis, min 6 caractères, hashé),
-  role: String (user|seller|admin, défaut: user),
-  avatar: String,
-  isActive: Boolean (défaut: true),
-  deletedAt: Date,
-  createdAt: Date,
-  updatedAt: Date
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "axios": "^1.6.0",
+    "react-icons": "^4.12.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "eslint": "^8.55.0"
+  }
 }
 ```
 
-### Product
+---
 
-```javascript
-{
-  title: String (requis),
-  description: String (requis),
-  price: Number (requis, ≥ 0),
-  stock: Number (requis, ≥ 0),
-  images: [String], // URLs des images
-  categoryIds: [ObjectId],
-  sellerId: ObjectId (requis),
-  isActive: Boolean (défaut: true),
-  averageRating: Number (0-5),
-  reviewCount: Number (défaut: 0),
-  deletedAt: Date,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+## 🎓 **Concepts React utilisés**
 
-### Category
+- ✅ **Hooks** : useState, useEffect, useContext, useNavigate
+- ✅ **Context API** : Gestion globale de l'état (AuthContext)
+- ✅ **Custom Hooks** : Logique réutilisable (useAuth, useFetch)
+- ✅ **Props & Composition** : Composants modulaires
+- ✅ **Conditional Rendering** : Affichage conditionnel
+- ✅ **Lists & Keys** : Rendu de listes optimisé
+- ✅ **Forms** : Gestion d'événements et validation
+- ✅ **Protected Routes** : Routes nécessitant authentification
 
-```javascript
-{
-  name: String (requis, unique),
-  description: String,
-  image: String,
-  isActive: Boolean (défaut: true),
-  deletedAt: Date,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+---
 
-### Cart
+## 📝 **Bonnes pratiques appliquées**
 
-```javascript
-{
-  userId: ObjectId (requis),
-  items: [{
-    productId: ObjectId (requis),
-    quantity: Number (requis, ≥ 1),
-    price: Number (requis)
-  }],
-  totalAmount: Number,
-  updatedAt: Date
-}
-```
+- ✅ Structure de dossiers claire et organisée
+- ✅ Composants réutilisables et modulaires
+- ✅ Séparation des responsabilités (UI / Logique / Services)
+- ✅ Gestion centralisée de l'état d'authentification
+- ✅ Validation côté client pour UX améliorée
+- ✅ Messages d'erreur clairs et contextuels
+- ✅ Code propre et commenté
+- ✅ Nommage cohérent (PascalCase pour composants)
+- ✅ Gestion des états de chargement et d'erreur
+- ✅ Responsive design systématique
 
-### Order
+---
 
-```javascript
-{
-  userId: ObjectId (requis),
-  items: [{
-    productId: ObjectId,
-    sellerId: ObjectId,
-    title: String,
-    price: Number,
-    quantity: Number
-  }],
-  totalAmount: Number,
-  couponId: ObjectId,
-  discountAmount: Number,
-  finalAmount: Number,
-  status: String (pending|paid|shipped|delivered|cancelled),
-  shippingAddress: Object,
-  paymentMethod: String,
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+## 📞 **Support**
 
-### Coupon
-
-```javascript
-{
-  code: String (requis, unique),
-  type: String (percentage|fixed),
-  value: Number (requis),
-  minAmount: Number,
-  maxDiscount: Number,
-  usageLimit: Number,
-  usedCount: Number (défaut: 0),
-  isActive: Boolean (défaut: true),
-  expiresAt: Date,
-  createdAt: Date
-}
-```
-
-### Review
-
-```javascript
-{
-  userId: ObjectId (requis),
-  productId: ObjectId (requis),
-  rating: Number (requis, 1-5),
-  comment: String,
-  isApproved: Boolean (défaut: false),
-  createdAt: Date,
-  updatedAt: Date
-}
-```
-
-### Notification
-
-```javascript
-{
-  userId: ObjectId (requis),
-  type: String (product|order|system),
-  title: String (requis),
-  message: String (requis),
-  data: Object, // Données additionnelles
-  isRead: Boolean (défaut: false),
-  createdAt: Date
-}
-```
-
-## 🔧 Scripts disponibles
-
-### Développement
-
-- `npm start` - Démarre l'application en mode production
-- `npm run dev` - Démarre l'application en mode développement avec nodemon
-
-### Base de données
-
-- `npm run seed` - Insère les données de test avec Faker.js
-- `npm run reset-db` - Réinitialise complètement la base de données
-
-### Tests
-
-- `npm test` - Lance tous les tests
-- `npm run test:unit` - Lance uniquement les tests unitaires
-- `npm run test:integration` - Lance uniquement les tests d'intégration
-- `npm run coverage` - Génère le rapport de couverture de code
-
-### Utilitaires
-
-- `npm run logs:clean` - Nettoie les anciens fichiers de logs
-- `npm run docs:generate` - Génère la documentation API
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
-## 📝 Licence
-
-Ce projet est sous licence ISC.
-
-## 👥 Équipe de développement
-
-- **Asfor Dounia** - [GitHub](https://github.com/AsforDounia)
-- **Souad Arziki** - [GitHub](https://github.com/souadarz)
-- **Mohammed Boukab** - [GitHub](https://github.com/Mo7amed-Boukab)
-
-_Projet développé en squad dans le cadre de la formation_
-
-## 🐛 Signaler un bug
-
-Pour signaler un bug, veuillez ouvrir une issue sur [GitHub Issues](https://github.com/AsforDounia/E-Market-API/issues).
+Pour toute question concernant le frontend :
+- Consulter les composants dans `src/components/`
+- Vérifier la configuration dans `vite.config.js`
+- Examiner les services API dans `src/services/api.js`
