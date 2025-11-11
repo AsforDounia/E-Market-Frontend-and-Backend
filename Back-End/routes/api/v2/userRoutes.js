@@ -163,7 +163,7 @@ userRoutes.delete(
 );
 
 userRoutes.put("/profile", createLimiter(15, 100), authenticate, usertController.updateProfile);
-
+userRoutes.put('/profile/password', authenticate, usertController.updatePassword);
 userRoutes.patch(
     "/:id/role",
     createLimiter(15, 100),

@@ -100,6 +100,7 @@ async function getAllProducts(req, res, next) {
     const filteredProducts = sortByRating
       ? await Product.find(filter).sort({ createdAt: -1 })
       : await Product.find(filter)
+          .select('-_v')
           .sort(sortOptions)
           .skip(skip)
           .limit(Number(limit));

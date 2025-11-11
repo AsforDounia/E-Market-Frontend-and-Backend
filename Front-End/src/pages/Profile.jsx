@@ -45,7 +45,7 @@ const passwordSchema = yup.object().shape({
     .required('Mot de passe actuel requis'),
   newPassword: yup
     .string()
-    .min(8, '8 caractères minimum')
+    .min(6, '6 caractères minimum')
     .required('Nouveau mot de passe requis'),
   confirmPassword: yup
     .string()
@@ -112,9 +112,23 @@ const Profile = () => {
     }
   }, [ordersError, activeTab]);
 
+  
   const onSubmitProfile = async (data) => {
     try {
-      console.log(data);
+      const response = await api.put('/users/profile', {
+        fullname: data.fullname,
+        email: data.email,
+      });
+
+      // Update user context with new data
+      if (response.data?.data?.user) {
+        updateUser(response.data.data.user);
+      }
+
+      setMessage({
+        type: 'success',
+        text: 'Profil mis à jour avec succès'
+      });
       setIsEditing(false);
     } catch (error) {
       console.error('Profile update error:', error);
@@ -127,15 +141,30 @@ const Profile = () => {
 
   const onSubmitPassword = async (data) => {
     try {
-      console.log(data);
+      await api.put('/users/profile/password', {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
+
+      setMessage({
+        type: 'success',
+        text: 'Mot de passe modifié avec succès'
+      });
+      
+      // Reset the password form after successful update
+      resetPassword({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
     } catch (error) {
       console.error('Password update error:', error);
-      setMessage({ 
-        type: 'error', 
+      setMessage({
+        type: 'error',
         text: error.response?.data?.message || 'Erreur lors de la modification du mot de passe' 
       });
     }
-  };
+    };
 
 
   const getOrderStatusBadge = (status) => {
