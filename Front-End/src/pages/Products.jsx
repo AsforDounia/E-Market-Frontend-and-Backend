@@ -398,7 +398,7 @@ const Products = () => {
                       </Link>
 
                       <div className="p-5">
-                        <Link to={`/product/${product._id}`}>
+                        <Link to={`/product/${product.slug}`}>
                           <h3 className="text-lg font-semibold mb-2 text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 min-h-[3.5rem]">
                             {product.title}
                           </h3>
