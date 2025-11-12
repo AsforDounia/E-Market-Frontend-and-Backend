@@ -5,8 +5,8 @@ import Alert from "./Alert";
 import { FcHome } from "react-icons/fc";
 import { AiOutlineLogout } from "react-icons/ai";
 
-const PublicRoute = ({ children }) => {
-  const { user, isAuthenticating } = useAuth(); // Get isAuthenticating
+const PublicRoute = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [closeAlert, setCloseAlert] = useState(false);
   
@@ -20,8 +20,7 @@ const PublicRoute = ({ children }) => {
     setCloseAlert(true);
   };
 
-  // Don't show alert if we're in the middle of authenticating
-  if (user && !isAuthenticating) {
+  if (user) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
         <div className="absolute inset-0 bg-black/50" onClick={handleClose} />

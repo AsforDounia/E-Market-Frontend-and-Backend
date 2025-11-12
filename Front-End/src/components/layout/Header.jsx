@@ -22,9 +22,9 @@ const Header = () => {
     : { to: '/products', label: 'Produits', icon: <FcShop /> };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className="bg-white shadow-md sticky top-0 z-60">
       <nav className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-opacity duration-300 ${mobileOpen ? 'opacity-40 pointer-events-none md:opacity-100 md:pointer-events-auto' : 'opacity-100'}`}>
-  <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16">
           {/* Left: Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2 text-indigo-600" onClick={closeMobile}>

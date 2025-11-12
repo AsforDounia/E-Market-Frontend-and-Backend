@@ -64,7 +64,7 @@ const Login = () => {
     }
   }, [loginError]);
   return (
-    <div className="min-h-max max-h-max bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-8 sm:py-12">
+    <div className="min-h-[91.2vh] max-h-max bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-8 sm:py-12">
       <div className="bg-white rounded-2xl shadow-2xl overflow-y-auto max-w-4xl w-full flex flex-col md:flex-row max-h-[78.3vh]">
         {/* Sidebar */}
         <div className="bg-linear-to-br from-blue-600 to-blue-800 p-8 sm:p-12 text-white flex flex-col justify-center hidden md:flex md:w-1/2">

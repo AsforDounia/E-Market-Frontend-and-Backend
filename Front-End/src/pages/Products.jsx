@@ -127,287 +127,234 @@ const Products = () => {
       )}
 
       {/* Modern Search and Filters Bar */}
-      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-5">
-          {filtersOpen ? (
-            <div className="py-3 sm:py-4">
-              {/* Search Bar with Toggle and Reset Buttons */}
-              <div className="flex gap-3 items-start">
-                <div className="flex-1">
-                  <div className="flex gap-3 items-center mb-3 sm:mb-4">
-                    <div className="flex-1 relative group">
-                      <FiSearch className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
-                      <input
-                        type="text"
-                        placeholder="Rechercher des produits..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 sm:pl-12 pr-10 py-3 sm:py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-base"
-                      />
-                      {searchTerm && (
-                        <button
-                          onClick={() => setSearchTerm('')}
-                          className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                          aria-label="clear search"
-                        >
-                          <FiX className="w-5 h-5" />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Mobile Filter Toggle */}
-                    <button
-                      onClick={() => setShowMobileFilters(true)}
-                      className="lg:hidden flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
-                      aria-label="Open filters"
-                    >
-                      <FiFilter className="w-5 h-5" />
-                      {activeFiltersCount > 0 && (
-                        <span className="bg-white text-blue-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {activeFiltersCount}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Desktop Filters */}
-                  <div className="hidden lg:grid grid-cols-6 gap-3">
-                    {/* Category */}
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => {
-                        setSelectedCategory(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
-                    >
-                      <option value="">📦 Toutes les catégories</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-
-                    {/* Min Price */}
-                    <input
-                      type="number"
-                      placeholder="💰 Prix min"
-                      value={minPrice}
-                      onChange={(e) => {
-                        setMinPrice(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
-                      min="0"
-                    />
-
-                    {/* Max Price */}
-                    <input
-                      type="number"
-                      placeholder="💰 Prix max"
-                      value={maxPrice}
-                      onChange={(e) => {
-                        setMaxPrice(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
-                      min="0"
-                    />
-
-                    {/* Sort */}
-                    <select
-                      value={`${sortBy}-${sortOrder}`}
-                      onChange={(e) => {
-                        const [newSortBy, newOrder] = e.target.value.split('-');
-                        setSortBy(newSortBy);
-                        setSortOrder(newOrder);
-                        setCurrentPage(1);
-                      }}
-                      className="col-span-2  px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
-                    >
-                      <option value="date-desc">🕐 Plus récent</option>
-                      <option value="price-asc">💵 Prix croissant</option>
-                      <option value="price-desc">💵 Prix décroissant</option>
-                      <option value="rating-desc">⭐ Note</option>
-                    </select>
-
-                    {/* Stock Toggle */}
-                    <label className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all">
-                      <input
-                        type="checkbox"
-                        checked={inStock}
-                        onChange={(e) => {
-                          setInStock(e.target.checked);
-                          setCurrentPage(1);
-                        }}
-                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                      />
-                      <span className="text-sm font-medium text-gray-700">✓ En stock</span>
-                    </label>
-                  </div>
-
-                  {/* Mobile Filters (as bottom sheet) */}
-                  {showMobileFilters && (
-                    <div className="lg:hidden">
-                      <div className="mt-56 z-50">
-                        <div
-                          className="absolute inset-0 bg-black/40"
-                          onClick={() => setShowMobileFilters(false)}
-                          aria-hidden="true"
-                        />
-                        <div className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl p-4 max-h-[70vh] overflow-auto shadow-xl animate-slideUp">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-lg font-semibold">Filtres</h3>
-                            <button
-                              onClick={() => setShowMobileFilters(false)}
-                              className="p-2 rounded-md text-gray-600 hover:bg-gray-100"
-                              aria-label="Close filters"
-                            >
-                              <IoClose className="w-6 h-6" />
-                            </button>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3">
-                            <select
-                              value={selectedCategory}
-                              onChange={(e) => {
-                                setSelectedCategory(e.target.value);
-                                setCurrentPage(1);
-                              }}
-                              className="col-span-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
-                            >
-                              <option value="">📦 Toutes les catégories</option>
-                              {categories.map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
-                              ))}
-                            </select>
-
-                            <input
-                              type="number"
-                              placeholder="💰 Prix min"
-                              value={minPrice}
-                              onChange={(e) => {
-                                setMinPrice(e.target.value);
-                                setCurrentPage(1);
-                              }}
-                              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
-                              min="0"
-                            />
-
-                            <input
-                              type="number"
-                              placeholder="💰 Prix max"
-                              value={maxPrice}
-                              onChange={(e) => {
-                                setMaxPrice(e.target.value);
-                                setCurrentPage(1);
-                              }}
-                              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
-                              min="0"
-                            />
-
-                            <select
-                              value={`${sortBy}-${sortOrder}`}
-                              onChange={(e) => {
-                                const [newSortBy, newOrder] = e.target.value.split('-');
-                                setSortBy(newSortBy);
-                                setSortOrder(newOrder);
-                                setCurrentPage(1);
-                              }}
-                              className="col-span-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
-                            >
-                              <option value="date-desc">🕐 Plus récent</option>
-                              <option value="price-asc">💵 Prix croissant</option>
-                              <option value="price-desc">💵 Prix décroissant</option>
-                              <option value="rating-desc">⭐ Note</option>
-                            </select>
-
-                            <label className="col-span-2 flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all">
-                              <input
-                                type="checkbox"
-                                checked={inStock}
-                                onChange={(e) => {
-                                  setInStock(e.target.checked);
-                                  setCurrentPage(1);
-                                }}
-                                className="w-4 h-4 text-blue-600 rounded"
-                              />
-                              <span className="text-sm font-medium text-gray-700">✓ En stock uniquement</span>
-                            </label>
-
-                            {/* <div className="col-span-2 flex gap-2">
-                              <button
-                                onClick={() => { setShowMobileFilters(false); }}
-                                className="flex-1 px-4 py-3 rounded-xl bg-gray-100 hover:bg-gray-200"
-                              >
-                                Appliquer
-                              </button>
-                              <button
-                                onClick={() => { handleResetFilters(); setShowMobileFilters(false); }}
-                                className="flex-1 px-4 py-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100"
-                              >
-                                Réinitialiser
-                              </button>
-                            </div> */}
-                            <div className="col-span-2 flex gap-2">
-                            <Button 
-                                onClick={() => { handleResetFilters(); setShowMobileFilters(false); }}
-                                fullWidth
-                                // className="flex-1 px-4 py-3 rounded-xl bg-red-300 text-red-600 hover:bg-red-100"
-                                variant='danger'
-                            >
-                                Réinitialiser
-                            </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-
-                {/* Collapse and Reset Buttons */}
-                {showMobileFilters && (
-                  <div className="flex flex-col gap-3">
-                    <Button
-                      variant="secondary"
-                      onClick={() => setFiltersOpen(false)}
-                      className="h-[52px] w-[52px]"
-                      title="Masquer les filtres"
-                    >
-                      <FaChevronUp />
-                    </Button>
-                    <Button
-                      variant='secondary'
-                      onClick={handleResetFilters}
-                      className={`h-[52px] w-[52px]`}
-                      title="Réinitialiser les filtres"
-                    >
-                      <FiRefreshCw />
-                    </Button>
-                  </div>
-
-                )}
-              </div>
+ {/* Modern Search and Filters Bar */}
+<div className="z-40 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+  <div className="container max-w-screen-xl mx-auto px-5 py-4">
+    {filtersOpen ? (
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
+        {/* Search Bar */}
+        <div className="flex-1 w-full">
+          <div className="flex gap-3 items-center mb-4">
+            <div className="flex-1 relative group">
+              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
+              <input
+                type="text"
+                placeholder="Rechercher des produits..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-base"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <FiX className="w-5 h-5" />
+                </button>
+              )}
             </div>
-          ) : (
-            /* Collapsed State */
-            <div className="py-2">
-              <Button
-                variant="secondary"
-                onClick={() => setFiltersOpen(true)}
-                className="w-full flex items-center justify-between"
+
+            {/* Mobile Filter Toggle */}
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="lg:hidden flex items-center gap-2 px-5 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+            >
+              <FiFilter className="w-5 h-5" />
+              {activeFiltersCount > 0 && (
+                <span className="bg-white text-blue-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Desktop Filters */}
+          <div className="hidden lg:grid grid-cols-6 gap-3">
+            {/* Category */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
+            >
+              <option value="">📦 Toutes les catégories</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+
+            {/* Min Price */}
+            <input
+              type="number"
+              placeholder="💰 Prix min"
+              value={minPrice}
+              onChange={(e) => {
+                setMinPrice(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
+              min="0"
+            />
+
+            {/* Max Price */}
+            <input
+              type="number"
+              placeholder="💰 Prix max"
+              value={maxPrice}
+              onChange={(e) => {
+                setMaxPrice(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
+              min="0"
+            />
+
+            {/* Sort */}
+            <select
+              value={`${sortBy}-${sortOrder}`}
+              onChange={(e) => {
+                const [newSortBy, newOrder] = e.target.value.split('-');
+                setSortBy(newSortBy);
+                setSortOrder(newOrder);
+                setCurrentPage(1);
+              }}
+              className="col-span-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all text-sm font-medium"
+            >
+              <option value="date-desc">🕐 Plus récent</option>
+              <option value="price-asc">💵 Prix croissant</option>
+              <option value="price-desc">💵 Prix décroissant</option>
+              <option value="rating-desc">⭐ Note</option>
+            </select>
+
+            {/* Stock Toggle */}
+            <label className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all">
+              <input
+                type="checkbox"
+                checked={inStock}
+                onChange={(e) => {
+                  setInStock(e.target.checked);
+                  setCurrentPage(1);
+                }}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium text-gray-700">✓ En stock</span>
+            </label>
+          </div>
+
+          {/* Mobile Filters */}
+          {showMobileFilters && (
+            <div className="lg:hidden grid grid-cols-2 gap-3 mt-4 animate-fadeIn">
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="col-span-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
               >
-                <span>Ouvrir la recherche et les filtres</span>
-                <FaChevronDown />
-              </Button>
+                <option value="">📦 Toutes les catégories</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+
+              <input
+                type="number"
+                placeholder="💰 Prix min"
+                value={minPrice}
+                onChange={(e) => {
+                  setMinPrice(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
+                min="0"
+              />
+
+              <input
+                type="number"
+                placeholder="💰 Prix max"
+                value={maxPrice}
+                onChange={(e) => {
+                  setMaxPrice(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
+                min="0"
+              />
+
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [newSortBy, newOrder] = e.target.value.split('-');
+                  setSortBy(newSortBy);
+                  setSortOrder(newOrder);
+                  setCurrentPage(1);
+                }}
+                className="col-span-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
+              >
+                <option value="date-desc">🕐 Plus récent</option>
+                <option value="price-asc">💵 Prix croissant</option>
+                <option value="price-desc">💵 Prix décroissant</option>
+                <option value="rating-desc">⭐ Note</option>
+              </select>
+
+              <label className="col-span-2 flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-100 transition-all">
+                <input
+                  type="checkbox"
+                  checked={inStock}
+                  onChange={(e) => {
+                    setInStock(e.target.checked);
+                    setCurrentPage(1);
+                  }}
+                  className="w-4 h-4 text-blue-600 rounded"
+                />
+                <span className="text-sm font-medium text-gray-700">✓ En stock uniquement</span>
+              </label>
             </div>
           )}
         </div>
+
+        {/* Collapse and Reset Buttons */}
+        <div className="min-h-full flex flex-col gap-4">
+          <Button
+            variant="secondary"
+            onClick={() => setFiltersOpen(false)}
+            className="h-[52px] w-[52px]"
+            title="Masquer les filtres"
+          >
+            <FaChevronUp />
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleResetFilters}
+            className={`h-[52px] w-[52px] ${activeFiltersCount > 0 ? 'cursor-not-allowed' : ''}`}
+            title="Réinitialiser les filtres"
+          >
+            <FiRefreshCw />
+          </Button>
+        </div>
       </div>
+    ) : (
+      /* Collapsed State */
+      <div className="py-2">
+        <Button
+          variant="secondary"
+          onClick={() => setFiltersOpen(true)}
+          className="w-full flex items-center justify-between"
+        >
+          <span>Ouvrir la recherche et les filtres</span>
+          <FaChevronDown />
+        </Button>
+      </div>
+    )}
+  </div>
+</div>
+
 
       {/* Products Section */}
-      <section className="container mx-auto px-4 sm:px-5 py-8 sm:py-10">
+      <section className="container max-w-screen-xl mx-auto px-5 py-12">
         {error && (
           <Alert 
             type="error" 
