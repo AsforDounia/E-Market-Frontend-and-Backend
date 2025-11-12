@@ -219,7 +219,7 @@ const Home = () => {
             {FEATURES.map((feature, index) => (
               <Card key={index} hover className="text-center">
                 <div
-                  className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-white`}
+                  className={`w-16 h-16 mx-auto mb-4 rounded-full bg-linear-to-br ${feature.gradient} flex items-center justify-center text-white`}
                 >
                   {feature.icon}
                 </div>

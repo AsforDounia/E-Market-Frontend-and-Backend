@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useLoaderData } from 'react-router-dom';
 import useFetch from '../hooks/useFetch';
 import logo from '../assets/images/e-market-logo.jpeg';
 import { Alert, Badge, Button, Card, LoadingSpinner, Pagination, StarRating } from '../components/common';
@@ -8,8 +8,9 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 
 const Products = () => {
+  const loaderData = useLoaderData();
   const [currentPage, setCurrentPage] = useState(1);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(loaderData?.data?.products || []);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   
   // Filter states
@@ -33,16 +34,18 @@ const Products = () => {
   
   const apiUrl = `products?page=${currentPage}&category=${category}&search=${search}&minPrice=${minPrice}&maxPrice=${maxPrice}&inStock=${inStock}&sortBy=${sortBy}&order=${order}`;
   
-  const { data = {}, loading, error } = useFetch(apiUrl);
+  const { data = loaderData, loading, error } = useFetch(apiUrl);
   const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/v2', '') : '';
 
   useEffect(() => {
     if (data?.data?.products) {
       setProducts(data.data.products);
+    } else if (loaderData?.data?.products) {
+      setProducts(loaderData.data.products);
     } else {
       setProducts([]);
     }
-  }, [data]);
+  }, [data, loaderData]);
 
   useEffect(() => {
     if (categoryFromUrl) {
@@ -57,7 +60,7 @@ const Products = () => {
     }
   }, [data?.metadata]);
 
-  const metadata = data?.metadata || {};
+  const metadata = data?.metadata || loaderData?.metadata || {};
 
   // Categories - you can fetch these from your API or pass as props
   const categories = ['Électronique', 'Vêtements', 'Maison', 'Sports', 'Livres'];
@@ -109,7 +112,7 @@ const Products = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
       {/* Hero Section with Category */}
       {(selectedCategory || categoryFromUrl) && (
         <div className="relative bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white py-12 sm:py-16 overflow-hidden">

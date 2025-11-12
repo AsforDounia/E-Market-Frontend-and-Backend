@@ -53,6 +53,7 @@ const Register = () => {
     try {
       setRegisterError(null);
       await registerUser(data);
+      // navigate("/products", { replace: true });
     } catch (error) {
       setRegisterError(
         error.response?.data?.message || "Une erreur s'est produite lors de l'inscription"
@@ -81,10 +82,10 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-8 sm:py-12">
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full flex flex-col md:flex-row">
+    <div className="min-h-max max-h-max bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center py-8 sm:py-12">
+      <div className="bg-white rounded-2xl shadow-2xl overflow-y-auto max-w-4xl w-full flex flex-col md:flex-row md:max-h-[78.3vh] sm:min-h-full">
         {/* Sidebar */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-8 sm:p-12 text-white flex flex-col justify-center hidden md:flex md:w-1/2">
+        <div className="bg-linear-to-br from-blue-600 to-blue-800 p-8 sm:p-12 text-white flex flex-col justify-center hidden md:flex md:w-1/2">
           <h2 className="text-2xl sm:text-3xl font-bold my-4 leading-tight">
             Rejoignez E-Market aujourd'hui
           </h2>
@@ -105,7 +106,7 @@ const Register = () => {
         </div>
 
         {/* Register Form */}
-        <div ref={formContainerRef}  className="p-6 sm:p-10 overflow-y-auto">
+        <div ref={formContainerRef}  className="p-6 md:py-4 sm:p-10 overflow-y-auto">
           <div className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">Inscription</h1>
             <p className="text-gray-600 text-sm sm:text-base">

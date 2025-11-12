@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useEffect, useState } from "react";
 import Alert from "./Alert";
@@ -6,7 +6,7 @@ import { FcHome } from "react-icons/fc";
 import { AiOutlineLogout } from "react-icons/ai";
 
 const PublicRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isAuthenticating } = useAuth(); // Get isAuthenticating
   const navigate = useNavigate();
   const [closeAlert, setCloseAlert] = useState(false);
   
@@ -20,7 +20,8 @@ const PublicRoute = ({ children }) => {
     setCloseAlert(true);
   };
 
-  if (user) {
+  // Don't show alert if we're in the middle of authenticating
+  if (user && !isAuthenticating) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
         <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
@@ -50,7 +51,7 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  return children;
+  return <Outlet />;
 };
 
 export default PublicRoute;
